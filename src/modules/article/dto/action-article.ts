@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class SimplifiedQuestionDto {
+export class AactionArticleDto {
     @Expose()
     id: number;
 
@@ -11,11 +11,14 @@ export class SimplifiedQuestionDto {
     headline: string;
 
     @Expose()
+    content: string;
+
+    @Expose()
+    image: string;
+
+    @Expose()
     status: string;
 
     @Expose()
     publish_date: Date;
-
-    @Expose()
-    views: number;
 }

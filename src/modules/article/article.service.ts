@@ -55,7 +55,6 @@ export class ArticleService {
             where:{status},
             order: [['publish_date', 'DESC']],
             limit,
-            attributes:['id','title','image']
         })
     }
 
@@ -64,7 +63,6 @@ export class ArticleService {
             where: { status },
             order: this.articleRepo.sequelize?.random(),
             limit,
-            attributes: ['id', 'title', 'image'],
         });
     }
 
@@ -74,16 +72,12 @@ export class ArticleService {
             where:{id,status},
             include:[{
                 model:Comment,
-                attributes:['id','comment','createdAt'],
                 include:[{
                     model:User,
-                    attributes:['id','name']
                 }]
             },{
                 model:Category,
-                attributes:['id','name']
             }],
-            attributes: ['id', 'image', 'title', 'headline', 'publish_date', 'views','content']
         })
         if(!article)
         {

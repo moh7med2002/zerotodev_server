@@ -3,19 +3,21 @@ import { ArticleService } from './article.service';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { createArtcileDto } from './dto/create-article.dto';
 import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
-import { ArticleDto } from './dto/article.dto';
 import { createImageInterceptor } from 'src/common/interceptors/createImage.interceptor';
 import { ItemStatus } from 'src/common/enums/itemStatus';
 import { OptionalUserGuard } from 'src/guards/optionalUser.guard';
 import { CurrentUser } from 'src/decorators/currentUser.decorator';
 import { User } from '../user/entities/user.entity';
 import { MulterExceptionFilter } from 'src/common/filters/multerException.filter';
+import { ArticleSummaryDto } from './dto/article-summary.dto';
+import { DetailedArticleDto } from './dto/detailed-article.dto';
+import { AactionArticleDto } from './dto/action-article';
 
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
-  @Serilaize(ArticleDto)
+  @Serilaize(AactionArticleDto)
   @UseGuards(AdminGuard)
   @Post('create')
   @UseInterceptors(createImageInterceptor('image', 'images'))
@@ -26,7 +28,7 @@ export class ArticleController {
     return this.articleService.create({ ...body, image: imageUrl });
   }
 
-  @Serilaize(ArticleDto)
+  @Serilaize(AactionArticleDto)
   @UseGuards(AdminGuard)
   @Put(':id')
   @UseInterceptors(createImageInterceptor('image', 'images'))
@@ -44,34 +46,25 @@ export class ArticleController {
     return this.articleService.getAll(+page,+limit,ItemStatus.PUBLISHED,categoryId)
   }
 
+  @Serilaize(ArticleSummaryDto)
   @Get('latest')
   getLatestArticles(@Query('limit') limit: string = '3')
   {
     return this.articleService.getLatest(+limit,ItemStatus.PUBLISHED)
   }
 
+  @Serilaize(ArticleSummaryDto)
   @Get('random')
   getRandomArticles(@Query('limit') limit: string = '3')
   {
     return this.articleService.getRandom(+limit,ItemStatus.PUBLISHED)
   }
 
+  @Serilaize(DetailedArticleDto)
   @UseGuards(OptionalUserGuard)
   @Get(':id')
   getSingleArticle(@Param('id') id:string,@CurrentUser() user:User,@Req() req)
   {
     return this.articleService.getOneWithTracking(+id, user, req.ip,ItemStatus.PUBLISHED);
   }
-
-  // @Patch(':id/archive')
-  // ArchiveArticle()
-  // {
-
-  // }
-
-  // @Patch(':id/publish')
-  // publishArticle()
-  // {
-
-  // }
 }

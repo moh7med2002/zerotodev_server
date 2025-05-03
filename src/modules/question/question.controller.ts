@@ -1,12 +1,11 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { AdminGuard } from 'src/guards/admin.guard';
-import { createQuestionDto } from './dto/createQuestion.dto';
+import { createQuestionDto } from './dto/create-question.dto';
 import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
-import { ActionQuestionDto } from './dto/actionQuestion.dto';
-import { QuestionDto } from './dto/question.dto';
+import { ActionQuestionDto } from './dto/action-question.dto';
 import { ItemStatus } from 'src/common/enums/itemStatus';
-import { QuestionSummaryDto } from './dto/questionSummary.dto';
+import { QuestionSummaryDto } from './dto/question-summary.dto';
 
 @Controller('question')
 export class QuestionController {
@@ -28,11 +27,10 @@ export class QuestionController {
     return this.questionService.update(body,+id)
   }
 
-  @Serilaize(QuestionDto)
   @Get('all')
-  getAllQuestions()
+  getAllQuestions(@Query('page') page: string = '1',@Query('limit') limit: string = '5')
   {
-    return this.questionService.findAll()
+    return this.questionService.findAll(+page,+limit,ItemStatus.PUBLISHED)
   }
 
   @Serilaize(QuestionSummaryDto)

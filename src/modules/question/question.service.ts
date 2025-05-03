@@ -1,9 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { Question } from './question.entity';
-import { createQuestionDto } from './dto/createQuestion.dto';
-import { Comment } from '../comment/comment.entity';
-import { User } from '../user/entities/user.entity';
+import { createQuestionDto } from './dto/create-question.dto';
 
 @Injectable()
 export class QuestionService {
@@ -33,16 +31,20 @@ export class QuestionService {
         return this.questionRepo.findByPk(id)
     }
 
-    findAll()
+    async findAll(page: number, limit: number, status: string,)
     {
-        return this.questionRepo.findAll({
-            include:[{
-                model:Comment,
-                include:[
-                    {model:User}
-                ]
-            }]
+        const offset = (page - 1) * limit;
+        const {rows,count} = await this.questionRepo.findAndCountAll({
+            where:{status},
+            limit,
+            offset,
+            order: [['publish_date', 'DESC']],
+            attributes:['id', 'title', 'headline', 'publish_date', 'views']
         })
+        return {
+            questions: rows,
+            totalPages: Math.ceil(count / limit),
+        };
     }
 
     getLatest(limit:number,status: string)
