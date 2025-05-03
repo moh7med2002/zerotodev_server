@@ -1,0 +1,77 @@
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ArticleService } from './article.service';
+import { AdminGuard } from 'src/guards/admin.guard';
+import { createArtcileDto } from './dto/create-article.dto';
+import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
+import { ArticleDto } from './dto/article.dto';
+import { createImageInterceptor } from 'src/common/interceptors/createImage.interceptor';
+import { ItemStatus } from 'src/common/enums/itemStatus';
+import { OptionalUserGuard } from 'src/guards/optionalUser.guard';
+import { CurrentUser } from 'src/decorators/currentUser.decorator';
+import { User } from '../user/entities/user.entity';
+import { MulterExceptionFilter } from 'src/common/filters/multerException.filter';
+
+@Controller('article')
+export class ArticleController {
+  constructor(private readonly articleService: ArticleService) {}
+
+  @Serilaize(ArticleDto)
+  @UseGuards(AdminGuard)
+  @Post('create')
+  @UseInterceptors(createImageInterceptor('image', 'images'))
+  @UseFilters(MulterExceptionFilter)
+  createArticle(@UploadedFile() file: Express.Multer.File,@Body() body: createArtcileDto)
+  {
+    const imageUrl = `/images/${file.filename}`;
+    return this.articleService.create({ ...body, image: imageUrl });
+  }
+
+  @Serilaize(ArticleDto)
+  @UseGuards(AdminGuard)
+  @Put(':id')
+  @UseInterceptors(createImageInterceptor('image', 'images'))
+  @UseFilters(MulterExceptionFilter)
+  updateArticle(@Param('id') id: string,@Body() body: Partial<createArtcileDto>,@UploadedFile() file?: Express.Multer.File)
+  {
+    const imageUrl = file ? `/images/${file.filename}` : undefined;
+    return this.articleService.update(+id, body, imageUrl);
+  }
+
+
+  @Get('all')
+  getArticles(@Query('page') page: string = '1',@Query('limit') limit: string = '5',@Query('category') categoryId?: string)
+  {
+    return this.articleService.getAll(+page,+limit,ItemStatus.PUBLISHED,categoryId)
+  }
+
+  @Get('latest')
+  getLatestArticles(@Query('limit') limit: string = '3')
+  {
+    return this.articleService.getLatest(+limit,ItemStatus.PUBLISHED)
+  }
+
+  @Get('random')
+  getRandomArticles(@Query('limit') limit: string = '3')
+  {
+    return this.articleService.getRandom(+limit,ItemStatus.PUBLISHED)
+  }
+
+  @UseGuards(OptionalUserGuard)
+  @Get(':id')
+  getSingleArticle(@Param('id') id:string,@CurrentUser() user:User,@Req() req)
+  {
+    return this.articleService.getOneWithTracking(+id, user, req.ip,ItemStatus.PUBLISHED);
+  }
+
+  // @Patch(':id/archive')
+  // ArchiveArticle()
+  // {
+
+  // }
+
+  // @Patch(':id/publish')
+  // publishArticle()
+  // {
+
+  // }
+}
