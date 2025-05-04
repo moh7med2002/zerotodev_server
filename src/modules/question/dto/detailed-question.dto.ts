@@ -1,7 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 import { CommentDto } from 'src/modules/comment/dto/comment.dto';
 
-export class QuestionDto {
+export class DetailedQuestionDto {
     @Expose()
     id: number;
 

@@ -1,12 +1,19 @@
+import { QuestionViewService } from './../question_view/question_view.service';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { Question } from './question.entity';
 import { createQuestionDto } from './dto/create-question.dto';
+import { User } from '../user/entities/user.entity';
+import { Comment } from '../comment/comment.entity';
+import { UserPointService } from '../user_point/user_point.service';
+import { CurrentUserPayload } from 'src/common/types/current-user.type';
 
 @Injectable()
 export class QuestionService {
     constructor(
         @Inject(repositories.question_repository) private questionRepo:typeof Question,
+        private userPointService:UserPointService,
+        private questionViewService:QuestionViewService
     ){}
     async create(body:createQuestionDto)
     {
@@ -62,5 +69,37 @@ export class QuestionService {
             order: this.questionRepo.sequelize?.random(),
             limit,
         });
+    }
+
+    async getOne(id:number,status:string)
+    {
+        const question = await this.questionRepo.findOne({
+            where:{id,status},
+            include:[{
+                model:Comment,
+                include:[{
+                    model:User,
+                }]
+            }],
+        })
+        if(!question)
+        {
+            throw new NotFoundException("المقالة غير متوفرة")
+        }
+        return question
+        }
+
+    async getOneWithTracking(id: number,user:User|null, ip: string,status:string)
+    {
+        const question = await this.getOne(id,status);
+        const alreadyViewed = await this.questionViewService.registerView(id, user, ip);
+        if (!alreadyViewed) {
+            question.views ++ ;
+            question.save()
+            if (user) {
+                await this.userPointService.givePointForQuestionRead(user.id, id);
+            }
+        }
+        return question
     }
 }
