@@ -95,4 +95,12 @@ export class UserService {
     {
         return this.userRepo.findByPk(id)
     }
+
+    async increasePoint(userId:number,points:number)
+    {
+        await this.userRepo.increment('points', {
+            by: points,
+            where: { id: userId },
+        });
+    }
 }

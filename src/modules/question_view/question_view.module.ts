@@ -6,5 +6,6 @@ import { QuestionViewProvider } from './question_view.provider';
 @Module({
   controllers: [QuestionViewController],
   providers: [QuestionViewService,...QuestionViewProvider],
+  exports:[QuestionViewService],
 })
 export class QuestionViewModule {}

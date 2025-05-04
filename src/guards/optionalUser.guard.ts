@@ -14,7 +14,6 @@ export class OptionalUserGuard implements CanActivate {
                 const decodedToken = await this.jwtService.verifyAsync(token, {
                 secret: 'token', 
             });
-
             request.currentUser = decodedToken;
         } catch (err) {
             request.currentUser = null;

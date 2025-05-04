@@ -9,6 +9,7 @@ import { Comment } from '../comment/comment.entity';
 import { User } from '../user/entities/user.entity';
 import { UserPointService } from '../user_point/user_point.service';
 import { removeImage } from 'src/common/utils/removeImage';
+import { CurrentUserPayload } from 'src/common/types/current-user.type';
 
 @Injectable()
 export class ArticleService {
@@ -86,7 +87,7 @@ export class ArticleService {
         return article
     }
     
-    async getOneWithTracking(id: number, user: User | null, ip: string,status:string)
+    async getOneWithTracking(id: number, user: User|null, ip: string,status:string)
     {
         const article = await this.getOne(id,status);
         const alreadyViewed = await this.articleViewService.registerView(id, user, ip);

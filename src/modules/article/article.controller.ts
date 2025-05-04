@@ -12,6 +12,7 @@ import { MulterExceptionFilter } from 'src/common/filters/multerException.filter
 import { ArticleSummaryDto } from './dto/article-summary.dto';
 import { DetailedArticleDto } from './dto/detailed-article.dto';
 import { AactionArticleDto } from './dto/action-article';
+import { UserInterceptor } from '../user/interceptors/user.interceptor';
 
 @Controller('article')
 export class ArticleController {
@@ -63,8 +64,10 @@ export class ArticleController {
   @Serilaize(DetailedArticleDto)
   @UseGuards(OptionalUserGuard)
   @Get(':id')
-  getSingleArticle(@Param('id') id:string,@CurrentUser() user:User,@Req() req)
+  getSingleArticle(@Param('id') id:string,@CurrentUser() user:User | null,@Req() req)
   {
+    console.log('-------------------------------------------------')
+    console.log(user)
     return this.articleService.getOneWithTracking(+id, user, req.ip,ItemStatus.PUBLISHED);
   }
 }
