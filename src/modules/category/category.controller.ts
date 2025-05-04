@@ -13,11 +13,11 @@ import { createCategoryDto } from './dto/create-category.dto';
 import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
 import { CategoryDto } from './dto/category.dto';
 
-@Serilaize(CategoryDto)
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @Serilaize(CategoryDto)
   @UseGuards(AdminGuard)
   @Post('create')
   createCategory(@Body() body: createCategoryDto) {
@@ -42,6 +42,7 @@ export class CategoryController {
     return this.categoryService.findOne(+categoryId);
   }
 
+  @Serilaize(CategoryDto)
   @Get('all')
   getCategories() {
     return this.categoryService.findAll();

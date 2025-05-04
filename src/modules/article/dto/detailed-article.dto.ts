@@ -3,32 +3,35 @@ import { CategoryDto } from 'src/modules/category/dto/category.dto';
 import { CommentDto } from 'src/modules/comment/dto/comment.dto';
 
 export class DetailedArticleDto {
-    @Expose()
-    id: number;
+  @Expose()
+  id: number;
 
-    @Expose()
-    image: string;
+  @Expose()
+  image: string;
 
-    @Expose()
-    title: string;
+  @Expose()
+  title: string;
 
-    @Expose()
-    headline: string;
+  @Expose()
+  headline: string;
 
-    @Expose()
-    publish_date: Date;
+  @Expose()
+  publish_date: Date;
 
-    @Expose()
-    views: number;
+  @Expose()
+  views: number;
 
-    @Expose()
-    content: string;
+  @Expose()
+  content: string;
 
-    @Expose()
-    @Type(() => CategoryDto)
-    category: CategoryDto;
+  @Expose()
+  status: string;
 
-    @Expose()
-    @Type(() => CommentDto)
-    comments: CommentDto[];
+  @Expose()
+  @Type(() => CategoryDto)
+  category: CategoryDto;
+
+  @Expose()
+  @Type(() => CommentDto)
+  comments: CommentDto[];
 }
