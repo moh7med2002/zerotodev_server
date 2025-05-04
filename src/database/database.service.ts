@@ -23,8 +23,8 @@ export const databaseProviders = [
         host: 'localhost',
         port: 3306,
         username: 'root',
-        password: '2838293yo',
-        // password: '059283805928388',
+        // password: '2838293yo',
+        password: '059283805928388',
         database: 'zerotodev_db',
       });
       sequelize.addModels([
