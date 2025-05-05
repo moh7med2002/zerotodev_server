@@ -146,6 +146,9 @@ export class ArticleService {
   async updateStatus(dto: UpdateArtcileStatusDto, articleId: number) {
     const article = await this.findOne(articleId);
     article.status = dto.status;
+    if (!article.publish_date) {
+      article.publish_date = new Date();
+    }
     return article.save();
   }
 
