@@ -1,7 +1,76 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { QuizService } from './quiz.service';
+import { AdminGuard } from 'src/guards/admin.guard';
+import { createQuizDto } from './dto/create-quiz.dto';
+import { ItemStatus } from 'src/common/enums/itemStatus';
+import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
+import { QuizDto } from './dto/quiz.dto';
+import { UpdateQuizStatusDto } from './dto/update-quiz-status.dto';
+import { CreateQuizWithQuestionsDto } from './dto/create-quiz-questions.dto';
+import { Quiz } from './quiz.entity';
 
 @Controller('quiz')
 export class QuizController {
   constructor(private readonly quizService: QuizService) {}
+
+  @UseGuards(AdminGuard)
+  @Post('/create')
+  createQuiz(@Body() dto: createQuizDto) {
+    return this.quizService.createQuiz(dto);
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('/admin/all')
+  getAllForAdmin(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '5',
+    @Query('status') status: string = ItemStatus.PUBLISHED,
+  ) {
+    return this.quizService.findAll(+page, +limit, status);
+  }
+
+  @UseGuards(AdminGuard)
+  @Patch('/update/:quizId/status')
+  updateArticleStatus(
+    @Body() dto: UpdateQuizStatusDto,
+    @Param('quizId') quizId: string,
+  ) {
+    return this.quizService.updateStatus(dto, +quizId);
+  }
+
+  @UseGuards(AdminGuard)
+  @Put('/admin/create-questions')
+  insertQuestionsToQuiz(@Body() dto: CreateQuizWithQuestionsDto) {
+    return this.quizService.createQuizQuestions(dto);
+  }
+
+  @Serilaize(QuizDto)
+  @UseGuards(AdminGuard)
+  @Get('/admin/:quizId')
+  quizDetailsForAdmin(@Param('quizId') quizId: string) {
+    return this.quizService.getQuizDetails(+quizId);
+  }
+
+  @Serilaize(QuizDto)
+  @UseGuards(AdminGuard)
+  @Get('/admin/:quizId/summary')
+  getQuiz(@Param('quizId') quizId: string) {
+    return this.quizService.findById(+quizId);
+  }
+
+  @UseGuards(AdminGuard)
+  @Put('/admin/:quizId/update')
+  updateQuizInfo(@Body() dto: createQuizDto, @Param('quizId') quizId: string) {
+    return this.quizService.updateQuizInfo(+quizId, dto);
+  }
 }
