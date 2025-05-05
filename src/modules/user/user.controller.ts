@@ -1,4 +1,4 @@
-import { Body, Controller, FileTypeValidator, ParseFilePipe, Patch, Post, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { createUserDto } from './dto/create-user.dto';
 import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
@@ -11,6 +11,7 @@ import { loginUserDto } from './dto/login-user.dto';
 import { UserGuard } from 'src/guards/user.guard';
 import { createImageInterceptor } from 'src/common/interceptors/createImage.interceptor';
 import { MulterExceptionFilter } from 'src/common/filters/multerException.filter';
+import { UserProfileDto } from './dto/user-profile.dto';
 
 @Controller('user')
 export class UserController {
@@ -31,6 +32,7 @@ export class UserController {
     return this.userService.login(body)
   }
 
+  @UseGuards(UserGuard)
   @Serilaize(UserDto)
   @Patch('email')
   @UseGuards(UserGuard)
@@ -47,4 +49,25 @@ export class UserController {
       return this.userService.changePassword(body,+user.id)
   }
 
+  @Serilaize(UserDto)
+  @UseGuards(UserGuard)
+  @Put('update')
+  @UseInterceptors(createImageInterceptor('image', 'images'))
+  @UseFilters(MulterExceptionFilter)
+  updateProfile(
+    @Body() body: Partial<User>,
+    @CurrentUser() user:User,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageUrl = file ? `/images/${file.filename}` : undefined;
+    return this.userService.update(body,user.id, imageUrl);
+  }
+
+  @Serilaize(UserProfileDto)
+  @UseGuards(UserGuard)
+  @Get('current')
+  getCurrentUser(@CurrentUser() user:User)
+  {
+    return user ;
+  }
 }

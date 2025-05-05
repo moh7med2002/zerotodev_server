@@ -46,7 +46,7 @@ export class AdminService {
   }
 
   async changePassword(body: UserPasswordDto) {
-    const { oldPassword, newpassword } = body;
+    const { oldPassword, newPassword } = body;
     const admin = await this.findOne();
     if (!admin) {
       throw new NotFoundException('admin is not found');
@@ -55,7 +55,7 @@ export class AdminService {
     if (!isMatch) {
       throw new BadRequestException('password is wrong');
     }
-    const hashedPassword = await hashPassword(newpassword);
+    const hashedPassword = await hashPassword(newPassword);
     admin.password = hashedPassword;
     await admin.save();
     return admin;
