@@ -12,4 +12,7 @@ export class UserProfileDto {
 
     @Expose()
     bio:string;
+    
+    @Expose()
+    email:string;
 }
