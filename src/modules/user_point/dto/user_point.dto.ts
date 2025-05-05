@@ -32,4 +32,4 @@ class RelatedEntityDto {
     @Expose()
     @Type(() => RelatedEntityDto)
     quiz?: RelatedEntityDto;
-}
+} 
