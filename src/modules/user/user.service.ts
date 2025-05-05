@@ -6,6 +6,7 @@ import { comparePassword, hashPassword } from 'src/common/utils/password';
 import { loginUserDto } from './dto/login-user.dto';
 import { UserPasswordDto } from './dto/user-password.dto';
 import { generateToken } from 'src/common/utils/generateToken';
+import { removeImage } from 'src/common/utils/removeImage';
 
 @Injectable()
 export class UserService {
@@ -68,7 +69,7 @@ export class UserService {
 
     async changePassword(body:UserPasswordDto,userId:number)
     {
-        const {oldPassword,newpassword} = body
+        const {oldPassword,newPassword} = body
         const user = await this.findById(userId)
         if(!user)
         {
@@ -79,7 +80,7 @@ export class UserService {
         {
             throw new BadRequestException('كلمة المرور خاطئة')
         }
-        const hashedPassword = await hashPassword(newpassword)
+        const hashedPassword = await hashPassword(newPassword)
         user.password = hashedPassword
         await user.save()
         return user
@@ -102,5 +103,21 @@ export class UserService {
             by: points,
             where: { id: userId },
         });
+    }
+
+    async update(attrs: Partial<User>,id:number, newImage?: string)
+    {
+        const user = await this.userRepo.findByPk(id);
+        if (!user) {
+            throw new NotFoundException('المستخدم غير موجود');
+        }
+        if (newImage && user.image ) {
+            if(user.image !== "/images/user.png")
+            await removeImage(user.image);
+            attrs.image = newImage;
+        }
+        Object.assign(user, attrs);
+        await user.save();
+        return user;
     }
 }

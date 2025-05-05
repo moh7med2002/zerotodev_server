@@ -3,6 +3,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { UserPoint } from './user_point.entity';
 import { Points } from 'src/common/enums/points';
+import { Article } from '../article/article.entity';
+import { Question } from '../question/question.entity';
+import { Quiz } from '../quiz/quiz.entity';
 
 @Injectable()
 export class UserPointService {
@@ -28,6 +31,19 @@ export class UserPointService {
             userId,
             questionId,
             activity_title: 'قراءة سؤال',
+        });
+    }
+
+    getUserPoints(userId:number)
+    {
+        return this.userPointRepo.findAll({
+            where: { userId },
+            include: [
+                {model:Article},
+                {model:Question},
+                {model:Quiz}
+            ],
+            order: [['date', 'DESC']],
         });
     }
 }

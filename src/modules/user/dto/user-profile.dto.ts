@@ -1,11 +1,8 @@
 import { Expose } from "class-transformer";
 
-export class UserDto {
+export class UserProfileDto {
     @Expose()
     id:number;
-
-    @Expose()
-    email:string;
 
     @Expose()
     image:string;
@@ -15,7 +12,7 @@ export class UserDto {
 
     @Expose()
     bio:string;
-
+    
     @Expose()
-    points:number
+    email:string;
 }
