@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Session, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Session,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { authAdminDto } from './dto/auth-admin.dto';
 import { AdminDto } from './dto/admin.dto';
@@ -12,32 +21,34 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post('signup')
-  async signupAdmin(@Body() body:authAdminDto)
-  {
-    const {email,password} = body
-    return this.adminService.signup(email,password)
+  async signupAdmin(@Body() body: authAdminDto) {
+    const { email, password } = body;
+    return this.adminService.signup(email, password);
   }
 
   @Post('login')
-  async loginAdmin(@Body() body:authAdminDto)
-  {
-    const {email,password} = body
-    return this.adminService.login(email,password)
+  async loginAdmin(@Body() body: authAdminDto) {
+    const { email, password } = body;
+    return this.adminService.login(email, password);
   }
 
   @Serilaize(AdminDto)
   @Patch('email')
   @UseGuards(AdminGuard)
-  changeAdminEmail(@Body() body:UserEmailDto)
-  {
-    return this.adminService.changeEmail(body.newEmail)
+  changeAdminEmail(@Body() body: UserEmailDto) {
+    return this.adminService.changeEmail(body.newEmail);
   }
-    
-    @Serilaize(AdminDto)
-    @Patch('password')
-    @UseGuards(AdminGuard)
-    changeAdminPassword(@Body() body:UserPasswordDto)
-    {
-        return this.adminService.changePassword(body)
-    }
+
+  @Serilaize(AdminDto)
+  @Patch('password')
+  @UseGuards(AdminGuard)
+  changeAdminPassword(@Body() body: UserPasswordDto) {
+    return this.adminService.changePassword(body);
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('/statistics')
+  getOverviewStatistics() {
+    return this.adminService.getStatistics();
+  }
 }

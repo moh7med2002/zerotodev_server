@@ -8,7 +8,8 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   controllers: [QuestionController],
-  providers: [QuestionService,...QuestionProvider],
-  imports:[UserPointModule,QuestionViewModule,UserModule]
+  providers: [QuestionService, ...QuestionProvider],
+  imports: [UserPointModule, QuestionViewModule, UserModule],
+  exports: [QuestionService],
 })
 export class QuestionModule {}

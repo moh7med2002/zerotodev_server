@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { User } from './entities/user.entity';
 import { createUserDto } from './dto/create-user.dto';
@@ -10,114 +15,106 @@ import { removeImage } from 'src/common/utils/removeImage';
 
 @Injectable()
 export class UserService {
-    constructor(
-        @Inject(repositories.user_repository) private userRepo:typeof User,
-    ){}
+  constructor(
+    @Inject(repositories.user_repository) private userRepo: typeof User,
+  ) {}
 
-    async signUp(body:createUserDto,imageUrl?:string)
-    {
-        const userByEmail = await this.findByEmail(body.email)
-        if(userByEmail)
-        {
-            throw new BadRequestException('الايميل مستخدم من قبل')
-        }
-        const passwordHased = await hashPassword(body.password)
-        const user = await this.userRepo.create({...body,password:passwordHased})
-        if(imageUrl)
-        {
-            user.image = imageUrl
-        }
-        await user.save()
-        const payload = {userId:user.id}
-        const access_token = generateToken(payload)
-        return {user:{id:user.id,email:user.email},token:access_token}
+  async signUp(body: createUserDto, imageUrl?: string) {
+    const userByEmail = await this.findByEmail(body.email);
+    if (userByEmail) {
+      throw new BadRequestException('الايميل مستخدم من قبل');
     }
-
-    async login(body:loginUserDto)
-    {
-        const userByEmail = await this.findByEmail(body.email)
-        if(!userByEmail)
-        {
-            throw new NotFoundException('الايميل غير صحيح')
-        }
-        const isMatch = await comparePassword(body.password,userByEmail.password)
-        if(!isMatch)
-        {
-            throw new BadRequestException('كلمة المرور خاطئة')
-        }
-        const payload = {userId:userByEmail.id}
-        const access_token = generateToken(payload)
-        return {user:{id:userByEmail.id,email:userByEmail.email},token:access_token}
+    const passwordHased = await hashPassword(body.password);
+    const user = await this.userRepo.create({
+      ...body,
+      password: passwordHased,
+    });
+    if (imageUrl) {
+      user.image = imageUrl;
     }
+    await user.save();
+    const payload = { userId: user.id };
+    const access_token = generateToken(payload);
+    return { user: { id: user.id, email: user.email }, token: access_token };
+  }
 
-    async changeEmail(newEmail:string,userId:number)
-    {
-        const user = await this.findById(userId)
-        if(!user)
-        {
-            throw new NotFoundException('المستخدم غير متوفر')
-        }
-        const userByEmail = await this.findByEmail(newEmail)
-        if(userByEmail)
-        {
-            throw new BadRequestException('الايميل مستهدم من قبل')
-        }
-        user.email = newEmail
-        await user.save()
-        return user
+  async login(body: loginUserDto) {
+    const userByEmail = await this.findByEmail(body.email);
+    if (!userByEmail) {
+      throw new NotFoundException('الايميل غير صحيح');
     }
-
-    async changePassword(body:UserPasswordDto,userId:number)
-    {
-        const {oldPassword,newPassword} = body
-        const user = await this.findById(userId)
-        if(!user)
-        {
-            throw new NotFoundException('المتسخدم غير متوفر')
-        }
-        const isMatch = await comparePassword(oldPassword,user.password)
-        if(!isMatch)
-        {
-            throw new BadRequestException('كلمة المرور خاطئة')
-        }
-        const hashedPassword = await hashPassword(newPassword)
-        user.password = hashedPassword
-        await user.save()
-        return user
+    const isMatch = await comparePassword(body.password, userByEmail.password);
+    if (!isMatch) {
+      throw new BadRequestException('كلمة المرور خاطئة');
     }
+    const payload = { userId: userByEmail.id };
+    const access_token = generateToken(payload);
+    return {
+      user: { id: userByEmail.id, email: userByEmail.email },
+      token: access_token,
+    };
+  }
 
-
-    findByEmail(email:string)
-    {
-        return this.userRepo.findOne({where:{email}})
+  async changeEmail(newEmail: string, userId: number) {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('المستخدم غير متوفر');
     }
-
-    findById(id:number)
-    {
-        return this.userRepo.findByPk(id)
+    const userByEmail = await this.findByEmail(newEmail);
+    if (userByEmail) {
+      throw new BadRequestException('الايميل مستهدم من قبل');
     }
+    user.email = newEmail;
+    await user.save();
+    return user;
+  }
 
-    async increasePoint(userId:number,points:number)
-    {
-        await this.userRepo.increment('points', {
-            by: points,
-            where: { id: userId },
-        });
+  async changePassword(body: UserPasswordDto, userId: number) {
+    const { oldPassword, newPassword } = body;
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('المتسخدم غير متوفر');
     }
+    const isMatch = await comparePassword(oldPassword, user.password);
+    if (!isMatch) {
+      throw new BadRequestException('كلمة المرور خاطئة');
+    }
+    const hashedPassword = await hashPassword(newPassword);
+    user.password = hashedPassword;
+    await user.save();
+    return user;
+  }
 
-    async update(attrs: Partial<User>,id:number, newImage?: string)
-    {
-        const user = await this.userRepo.findByPk(id);
-        if (!user) {
-            throw new NotFoundException('المستخدم غير موجود');
-        }
-        if (newImage && user.image ) {
-            if(user.image !== "/images/user.png")
-            await removeImage(user.image);
-            attrs.image = newImage;
-        }
-        Object.assign(user, attrs);
-        await user.save();
-        return user;
+  findByEmail(email: string) {
+    return this.userRepo.findOne({ where: { email } });
+  }
+
+  findById(id: number) {
+    return this.userRepo.findByPk(id);
+  }
+
+  async increasePoint(userId: number, points: number) {
+    await this.userRepo.increment('points', {
+      by: points,
+      where: { id: userId },
+    });
+  }
+
+  async update(attrs: Partial<User>, id: number, newImage?: string) {
+    const user = await this.userRepo.findByPk(id);
+    if (!user) {
+      throw new NotFoundException('المستخدم غير موجود');
     }
+    if (newImage && user.image) {
+      if (user.image !== '/images/user.png') await removeImage(user.image);
+      attrs.image = newImage;
+    }
+    Object.assign(user, attrs);
+    await user.save();
+    return user;
+  }
+
+  countUsers() {
+    return this.userRepo.count();
+  }
 }

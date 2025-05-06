@@ -26,7 +26,7 @@ export class QuizService {
 
     private readonly quizQuistionService: QuizQuestionService,
     private readonly quizAnswerService: QuizAnswerService,
-    private readonly userQuizService : UserQuizService
+    private readonly userQuizService: UserQuizService,
   ) {}
 
   async createQuiz(dto: createQuizDto) {
@@ -120,10 +120,9 @@ export class QuizService {
     return quiz;
   }
 
-  async findOneForUser(id:number,userId:number)
-  {
+  async findOneForUser(id: number, userId: number) {
     const quiz = await this.quizRepo.findOne({
-      where:{status:ItemStatus.PUBLISHED,id},
+      where: { status: ItemStatus.PUBLISHED, id },
       attributes: {
         include: [
           [
@@ -133,19 +132,19 @@ export class QuizService {
                 WHERE a.quizId = Quiz.id
                 )
               `),
-              'questionCount',
-            ],
+            'questionCount',
+          ],
         ],
-    }})
+      },
+    });
 
-    if(!quiz)
-    {
-      throw new NotFoundException("الكويز غير متوفر")
+    if (!quiz) {
+      throw new NotFoundException('الكويز غير متوفر');
     }
-    const userQuiz = await this.userQuizService.findOne(quiz.id,userId)
-    const hasSubmitted  = userQuiz ? true:false
-    const marks = userQuiz ? userQuiz.mark : null
-    return {quiz,marks,hasSubmitted}
+    const userQuiz = await this.userQuizService.findOne(quiz.id, userId);
+    const hasSubmitted = userQuiz ? true : false;
+    const marks = userQuiz ? userQuiz.mark : null;
+    return { quiz, marks, hasSubmitted };
   }
 
   async getQuizWithQuestionsForUser(quizId: number, userId: number) {
@@ -159,11 +158,11 @@ export class QuizService {
         },
       ],
     });
-  
+
     if (!quiz) {
       throw new NotFoundException('الاختبار غير متاح');
     }
-  
+
     // Check if user already submitted
     const userQuiz = await this.userQuizService.findOne(quizId, userId);
     if (userQuiz) {
@@ -171,5 +170,8 @@ export class QuizService {
     }
     return quiz;
   }
-  
+
+  countQuizes() {
+    return this.quizRepo.count();
+  }
 }

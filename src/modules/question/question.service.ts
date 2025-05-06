@@ -132,4 +132,8 @@ export class QuestionService {
     }
     return question;
   }
+
+  countQuestions() {
+    return this.questionRepo.count();
+  }
 }

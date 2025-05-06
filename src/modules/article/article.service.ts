@@ -161,4 +161,8 @@ export class ArticleService {
     }
     return article;
   }
+
+  countArticles() {
+    return this.articleRepo.count();
+  }
 }

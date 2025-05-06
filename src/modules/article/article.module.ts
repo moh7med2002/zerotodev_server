@@ -9,7 +9,8 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   controllers: [ArticleController],
-  providers: [ArticleService,...ArticleProvider],
-  imports:[CategoryModule,UserPointModule,ArticleViewModule,UserModule]
+  providers: [ArticleService, ...ArticleProvider],
+  imports: [CategoryModule, UserPointModule, ArticleViewModule, UserModule],
+  exports: [ArticleService],
 })
 export class ArticleModule {}
