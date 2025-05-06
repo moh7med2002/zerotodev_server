@@ -7,4 +7,9 @@ export class UserQuizService {
     constructor(
         @Inject(repositories.user_quiz_repository) private userQuizRepo:typeof UserQuiz,
     ){}
+
+    findOne(quizId:number,userId:number)
+    {
+        return this.userQuizRepo.findOne({where:{userId,quizId}})
+    }
 }

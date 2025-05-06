@@ -10,7 +10,7 @@ export class UserGuard implements CanActivate {
         const token = request.headers.authorization;
 
         if (!token) {
-            throw new UnauthorizedException('No token provided');
+            throw new UnauthorizedException('يجب عليك تسجيل الدخول');
         }
 
         try {

@@ -1,4 +1,3 @@
-// create-quiz.dto.ts
 import {
   IsInt,
   IsString,

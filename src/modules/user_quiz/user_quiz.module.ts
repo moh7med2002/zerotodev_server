@@ -6,5 +6,6 @@ import { UserQuizProvider } from './user_quiz.provider';
 @Module({
   controllers: [UserQuizController],
   providers: [UserQuizService,...UserQuizProvider],
+  exports:[UserQuizService]
 })
 export class UserQuizModule {}

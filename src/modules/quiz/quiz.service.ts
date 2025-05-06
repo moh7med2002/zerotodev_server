@@ -1,8 +1,10 @@
+import { UserQuizService } from './../user_quiz/user_quiz.service';
 import {
   BadGatewayException,
   BadRequestException,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { Quiz } from './quiz.entity';
@@ -24,6 +26,7 @@ export class QuizService {
 
     private readonly quizQuistionService: QuizQuestionService,
     private readonly quizAnswerService: QuizAnswerService,
+    private readonly userQuizService : UserQuizService
   ) {}
 
   async createQuiz(dto: createQuizDto) {
@@ -41,6 +44,7 @@ export class QuizService {
       limit,
       offset,
       order: [[orderBy, 'DESC']],
+      raw: true,
       attributes: {
         include: [
           [
@@ -115,4 +119,57 @@ export class QuizService {
     }
     return quiz;
   }
+
+  async findOneForUser(id:number,userId:number)
+  {
+    const quiz = await this.quizRepo.findOne({
+      where:{status:ItemStatus.PUBLISHED,id},
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`
+              (SELECT COUNT(*) 
+                FROM quiz_questions AS a 
+                WHERE a.quizId = Quiz.id
+                )
+              `),
+              'questionCount',
+            ],
+        ],
+    }})
+
+    if(!quiz)
+    {
+      throw new NotFoundException("الكويز غير متوفر")
+    }
+    const userQuiz = await this.userQuizService.findOne(quiz.id,userId)
+    const hasSubmitted  = userQuiz ? true:false
+    const marks = userQuiz ? userQuiz.mark : null
+    return {quiz,marks,hasSubmitted}
+  }
+
+  async getQuizWithQuestionsForUser(quizId: number, userId: number) {
+    // Check if quiz exists and is published
+    const quiz = await this.quizRepo.findOne({
+      where: { id: quizId, status: ItemStatus.PUBLISHED },
+      include: [
+        {
+          model: QuizQuestion,
+          include: [QuizAnswer],
+        },
+      ],
+    });
+  
+    if (!quiz) {
+      throw new NotFoundException('الاختبار غير متاح');
+    }
+  
+    // Check if user already submitted
+    const userQuiz = await this.userQuizService.findOne(quizId, userId);
+    if (userQuiz) {
+      throw new BadRequestException('لقد قمت بحل هذا الاختبار بالفعل');
+    }
+    return quiz;
+  }
+  
 }

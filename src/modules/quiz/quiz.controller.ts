@@ -17,7 +17,12 @@ import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
 import { QuizDto } from './dto/quiz.dto';
 import { UpdateQuizStatusDto } from './dto/update-quiz-status.dto';
 import { CreateQuizWithQuestionsDto } from './dto/create-quiz-questions.dto';
-import { Quiz } from './quiz.entity';
+import { QuizListResponseDto } from './dto/quizListdto';
+import { UserGuard } from 'src/guards/user.guard';
+import { CurrentUser } from 'src/decorators/currentUser.decorator';
+import { User } from '../user/entities/user.entity';
+import { QuizUserViewResponseDto } from './dto/quiz-user-view.dto';
+import { QuizWithQuestionsDto } from './dto/quiz-with-questions.dto';
 
 @Controller('quiz')
 export class QuizController {
@@ -29,9 +34,9 @@ export class QuizController {
     return this.quizService.createQuiz(dto);
   }
 
-  @UseGuards(AdminGuard)
-  @Get('/admin/all')
-  getAllForAdmin(
+  @Serilaize(QuizListResponseDto)
+  @Get('/all')
+  getAll(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '5',
     @Query('status') status: string = ItemStatus.PUBLISHED,
@@ -41,7 +46,7 @@ export class QuizController {
 
   @UseGuards(AdminGuard)
   @Patch('/update/:quizId/status')
-  updateArticleStatus(
+  updateQuizStatus(
     @Body() dto: UpdateQuizStatusDto,
     @Param('quizId') quizId: string,
   ) {
@@ -72,5 +77,22 @@ export class QuizController {
   @Put('/admin/:quizId/update')
   updateQuizInfo(@Body() dto: createQuizDto, @Param('quizId') quizId: string) {
     return this.quizService.updateQuizInfo(+quizId, dto);
+  }
+
+  @Serilaize(QuizUserViewResponseDto)
+  @UseGuards(UserGuard)
+  @Get('user/:quizId')
+  getQuizForUser(@Param('quizId') id:string,@CurrentUser() user:User)
+  {
+    return this.quizService.findOneForUser(+id,+user.id)
+  }
+
+  @Serilaize(QuizWithQuestionsDto)
+  @UseGuards(UserGuard)
+  @Get('user/:quizId/questions')
+  getQuizWithQuestionsForUser
+  (@Param('quizId') id:string,@CurrentUser() user:User)
+  {
+    return this.quizService.getQuizWithQuestionsForUser(+id,+user.id)
   }
 }
