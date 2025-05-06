@@ -7,8 +7,9 @@ import { QuizAnswerModule } from '../quiz_answer/quiz_answer.module';
 import { UserQuizModule } from '../user_quiz/user_quiz.module';
 
 @Module({
-  imports: [QuizQuestionModule, QuizAnswerModule,UserQuizModule],
+  imports: [QuizQuestionModule, QuizAnswerModule, UserQuizModule],
   controllers: [QuizController],
   providers: [QuizService, ...QuizProvider],
+  exports: [QuizService],
 })
 export class QuizModule {}

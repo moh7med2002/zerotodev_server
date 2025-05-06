@@ -9,11 +9,19 @@ import { Admin } from './entities/admin.entity';
 import { comparePassword, hashPassword } from 'src/common/utils/password';
 import { UserPasswordDto } from '../user/dto/user-password.dto';
 import { generateToken } from 'src/common/utils/generateToken';
+import { UserService } from '../user/user.service';
+import { ArticleService } from '../article/article.service';
+import { QuizService } from '../quiz/quiz.service';
+import { QuestionService } from '../question/question.service';
 
 @Injectable()
 export class AdminService {
   constructor(
     @Inject(repositories.admin_repository) private adminRepo: typeof Admin,
+    private readonly userService: UserService,
+    private readonly articleService: ArticleService,
+    private readonly quizService: QuizService,
+    private readonly questionService: QuestionService,
   ) {}
 
   async signup(email: string, password: string) {
@@ -87,5 +95,16 @@ export class AdminService {
     const admin = await this.adminRepo.create({ email, password });
     await admin.save();
     return admin;
+  }
+
+  async getStatistics() {
+    const [userCount, articleCount, quizCount, questionCount] =
+      await Promise.all([
+        this.userService.countUsers(),
+        this.articleService.countArticles(),
+        this.quizService.countQuizes(),
+        this.questionService.countQuestions(),
+      ]);
+    return { userCount, articleCount, quizCount, questionCount };
   }
 }
