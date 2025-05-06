@@ -6,6 +6,9 @@ export class AnswerDto {
 
     @Expose()
     title: string;
+
+    @Expose()
+    isCorrect:boolean
 }
 
 export class QuestionDto {
