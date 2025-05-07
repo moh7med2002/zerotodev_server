@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { UserQuiz } from './user_quiz.entity';
 
@@ -11,5 +11,18 @@ export class UserQuizService {
     findOne(quizId:number,userId:number)
     {
         return this.userQuizRepo.findOne({where:{userId,quizId}})
+    }
+
+    async saveUserQuizResult(userId: number, quizId: number, mark: number) {
+        const userQuiz = await this.userQuizRepo.create({quizId,userId,mark})
+        return userQuiz
+    }
+
+    async checkQuizApplited(quizId:number,userId:number)
+    {
+        const userQuiz = await this.findOne(quizId, userId);
+        if (userQuiz) {
+            throw new BadRequestException('لقد قمت بحل هذا الاختبار بالفعل');
+        }
     }
 }
