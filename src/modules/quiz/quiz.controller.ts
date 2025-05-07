@@ -23,6 +23,7 @@ import { CurrentUser } from 'src/decorators/currentUser.decorator';
 import { User } from '../user/entities/user.entity';
 import { QuizUserViewResponseDto } from './dto/quiz-user-view.dto';
 import { QuizWithQuestionsDto } from './dto/quiz-with-questions.dto';
+import { SubmitQuizDto } from './dto/submit-quiz.dot';
 
 @Controller('quiz')
 export class QuizController {
@@ -94,5 +95,12 @@ export class QuizController {
   (@Param('quizId') id:string,@CurrentUser() user:User)
   {
     return this.quizService.getQuizWithQuestionsForUser(+id,+user.id)
+  }
+
+  @UseGuards(UserGuard)
+  @Post('/submit')
+  submitQuiz(@CurrentUser() user:User,@Body() body:SubmitQuizDto)
+  {
+    return this.quizService.submitQuiz(user.id,body)
   }
 }

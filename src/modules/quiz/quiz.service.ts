@@ -17,6 +17,7 @@ import { QuizAnswer } from '../quiz_answer/quiz_answer.entity';
 import { QuizQuestionService } from '../quiz_question/quiz_question.service';
 import { QuizAnswerService } from '../quiz_answer/quiz_answer.service';
 import { CreateQuizWithQuestionsDto } from './dto/create-quiz-questions.dto';
+import { SubmitQuizDto } from './dto/submit-quiz.dot';
 
 @Injectable()
 export class QuizService {
@@ -123,16 +124,16 @@ export class QuizService {
   async findOneForUser(id: number, userId: number) {
     const quiz = await this.quizRepo.findOne({
       where: { status: ItemStatus.PUBLISHED, id },
+      raw:true,
       attributes: {
         include: [
           [
-            Sequelize.literal(`
-              (SELECT COUNT(*) 
-                FROM quiz_questions AS a 
-                WHERE a.quizId = Quiz.id
-                )
-              `),
-            'questionCount',
+            Sequelize.literal(`(
+              SELECT COUNT(*) 
+              FROM quiz_questions AS a 
+              WHERE a.quizId = Quiz.id
+              )`),
+            'quistionCount',
           ],
         ],
       },
@@ -164,14 +165,31 @@ export class QuizService {
     }
 
     // Check if user already submitted
-    const userQuiz = await this.userQuizService.findOne(quizId, userId);
-    if (userQuiz) {
-      throw new BadRequestException('لقد قمت بحل هذا الاختبار بالفعل');
-    }
+    await this.userQuizService.checkQuizApplited(quizId, userId);
     return quiz;
   }
 
   countQuizes() {
     return this.quizRepo.count();
   }
+
+  async submitQuiz(userId:number,body:SubmitQuizDto)
+  {
+    const {quizId,answers} = body
+      // 1. Fetch quiz with questions and check if it applied
+      const quiz = await this.getQuizWithQuestionsForUser(quizId,userId);
+      const totalQuestions = quiz.questions.length;
+    
+      const submittedAnswers = await this.quizAnswerService.getSubmittedAnswers(answers);
+      this.quizAnswerService.validateSubmittedAnswers(submittedAnswers, totalQuestions);
+    
+      const correctCount = this.quizAnswerService.countCorrectAnswers(submittedAnswers);
+      await this.userQuizService.saveUserQuizResult(userId, quizId, correctCount);
+    
+      return {
+        totalQuestions,
+        correctAnswers: correctCount,
+        score: `${correctCount} / ${totalQuestions}`,
+      };
+    }
 }

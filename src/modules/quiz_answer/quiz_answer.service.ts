@@ -1,6 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { QuizAnswer } from './quiz_answer.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class QuizAnswerService {
@@ -11,5 +12,29 @@ export class QuizAnswerService {
 
   async createAnswers(answers) {
     return this.quizAnswerRepo.bulkCreate(answers);
+  }
+
+  async getSubmittedAnswers(answerIds: number[]) {
+    const answers = await QuizAnswer.findAll({
+      where: { id: { [Op.in]: answerIds } },
+      include: ['question'],
+    });
+  
+    if (answers.length === 0) {
+      throw new BadRequestException('Submitted answers not found.');
+    }
+  
+    return answers;
+  }
+  
+  validateSubmittedAnswers(answers: QuizAnswer[], expectedCount: number) {
+    const uniqueQuestions = new Set(answers.map(a => a.questionId));
+    if (uniqueQuestions.size !== expectedCount) {
+      throw new BadRequestException('You must answer all questions.');
+    }
+  }
+  
+  countCorrectAnswers(answers: QuizAnswer[]) {
+    return answers.filter(a => a.isCorrect).length;
   }
 }
