@@ -20,4 +20,7 @@ export class UserQuiz extends Model {
 
     @Column(DataType.INTEGER)
     mark: number;
+
+    @Column(DataType.INTEGER)
+    total: number;
 }
