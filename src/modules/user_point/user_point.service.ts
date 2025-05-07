@@ -34,6 +34,17 @@ export class UserPointService {
         });
     }
 
+    async givePointForQuizSubmittion(userId: number, quizId: number,quizMark:number) {
+        await this.userService.increasePoint(userId,Points.answer * quizMark)
+        await this.userPointRepo.create({
+            date: new Date(),
+            points: Points.answer * quizMark,
+            userId,
+            quizId,
+            activity_title: 'إنهاء كويز',
+        });
+    }
+
     getUserPoints(userId:number)
     {
         return this.userPointRepo.findAll({

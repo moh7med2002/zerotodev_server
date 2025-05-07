@@ -1,3 +1,4 @@
+import { UserPointService } from './../user_point/user_point.service';
 import { UserQuizService } from './../user_quiz/user_quiz.service';
 import {
   BadGatewayException,
@@ -28,6 +29,7 @@ export class QuizService {
     private readonly quizQuistionService: QuizQuestionService,
     private readonly quizAnswerService: QuizAnswerService,
     private readonly userQuizService: UserQuizService,
+    private readonly userPointService: UserPointService,
   ) {}
 
   async createQuiz(dto: createQuizDto) {
@@ -184,7 +186,8 @@ export class QuizService {
       this.quizAnswerService.validateSubmittedAnswers(submittedAnswers, totalQuestions);
     
       const correctCount = this.quizAnswerService.countCorrectAnswers(submittedAnswers);
-      await this.userQuizService.saveUserQuizResult(userId, quizId, correctCount);
+      await this.userQuizService.saveUserQuizResult(userId, quizId, correctCount,totalQuestions);
+      await this.userPointService.givePointForQuizSubmittion(userId,quizId,correctCount)
     
       return {
         totalQuestions,

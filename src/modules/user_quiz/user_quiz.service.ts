@@ -1,6 +1,7 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { UserQuiz } from './user_quiz.entity';
+import { Quiz } from '../quiz/quiz.entity';
 
 @Injectable()
 export class UserQuizService {
@@ -13,8 +14,8 @@ export class UserQuizService {
         return this.userQuizRepo.findOne({where:{userId,quizId}})
     }
 
-    async saveUserQuizResult(userId: number, quizId: number, mark: number) {
-        const userQuiz = await this.userQuizRepo.create({quizId,userId,mark})
+    async saveUserQuizResult(userId: number, quizId: number, mark: number,total:number) {
+        const userQuiz = await this.userQuizRepo.create({quizId,userId,mark,total})
         return userQuiz
     }
 
@@ -24,5 +25,13 @@ export class UserQuizService {
         if (userQuiz) {
             throw new BadRequestException('لقد قمت بحل هذا الاختبار بالفعل');
         }
+    }
+
+    getUserQuizes(userId:number)
+    {
+        return this.userQuizRepo.findAll({
+            where:{userId},
+            include:[Quiz]
+        })
     }
 }
