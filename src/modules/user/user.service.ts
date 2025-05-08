@@ -12,6 +12,11 @@ import { loginUserDto } from './dto/login-user.dto';
 import { UserPasswordDto } from './dto/user-password.dto';
 import { generateToken } from 'src/common/utils/generateToken';
 import { removeImage } from 'src/common/utils/removeImage';
+import { UserPoint } from '../user_point/user_point.entity';
+import { QuestionView } from '../question_view/question_view.entity';
+import { ArticleView } from '../article_view/article_view.entity';
+import { Quiz } from '../quiz/quiz.entity';
+import { Comment } from '../comment/comment.entity';
 
 @Injectable()
 export class UserService {
@@ -116,5 +121,33 @@ export class UserService {
 
   countUsers() {
     return this.userRepo.count();
+  }
+
+  async getAllUsers(page: number, limit: number) {
+    const offset = (page - 1) * limit;
+    const { rows, count } = await this.userRepo.findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: ['id', 'name', 'email', 'image', 'points'],
+    });
+    return { users: rows, totalPages: Math.ceil(count / limit) };
+  }
+
+  async getUserProfileForAdmin(userId: number) {
+    const user = await this.userRepo.findOne({
+      where: { id: 1 },
+      include: [
+        // { model: ArticleView, include: ['article'] },
+        // { model: QuestionView, include: ['question'] },
+        { model: Comment },
+        { model: UserPoint },
+        { model: Quiz },
+      ],
+    });
+    if (!user) {
+      throw new Error('هذا المستخدم غير موجود');
+    }
+    return user;
   }
 }
