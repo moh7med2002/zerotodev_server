@@ -136,14 +136,8 @@ export class UserService {
 
   async getUserProfileForAdmin(userId: number) {
     const user = await this.userRepo.findOne({
-      where: { id: 1 },
-      include: [
-        // { model: ArticleView, include: ['article'] },
-        // { model: QuestionView, include: ['question'] },
-        { model: Comment },
-        { model: UserPoint },
-        { model: Quiz },
-      ],
+      where: { id: userId },
+      include: [{ model: Comment }, { model: UserPoint }, { model: Quiz }],
     });
     if (!user) {
       throw new Error('هذا المستخدم غير موجود');

@@ -26,6 +26,7 @@ import { createImageInterceptor } from 'src/common/interceptors/createImage.inte
 import { MulterExceptionFilter } from 'src/common/filters/multerException.filter';
 import { UserProfileDto } from './dto/user-profile.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { AdminUserProfileDto } from './dto/user-profile-admin.dto';
 
 @Controller('user')
 export class UserController {
@@ -92,8 +93,9 @@ export class UserController {
     return this.userService.getAllUsers(+page, +limit);
   }
 
+  @Serilaize(AdminUserProfileDto)
   @Get('admin/:userId')
-  getAdminProfile(@Param('id') id: string) {
-    return this.userService.getUserProfileForAdmin(+id);
+  getAdminProfile(@Param('userId') userId: string) {
+    return this.userService.getUserProfileForAdmin(+userId);
   }
 }
