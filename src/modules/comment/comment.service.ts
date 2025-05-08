@@ -39,4 +39,15 @@ export class CommentService {
         
         return {message:"تم إضافة التعليق بنجاح"};
     }
+
+    async delete(userId:number,commentId:number)
+    {
+        const comment = await this.commentRepo.findByPk(commentId)
+        if(!comment || comment.userId!==userId)
+        {
+            throw new BadRequestException('غير مسموح لك بحذف التعليق')
+        }
+        await comment.destroy()
+        return {message:"تم حذف التعليق"}
+    }
 }

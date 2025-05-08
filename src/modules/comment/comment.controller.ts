@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { UserGuard } from 'src/guards/user.guard';
 import { createCommentDto } from './dto/create-comment.dto';
@@ -14,5 +14,12 @@ export class CommentController {
   createComment(@Body() body:createCommentDto,@CurrentUser() user:User)
   {
     return this.commentService.create(body,user.id)
+  }
+
+  @UseGuards(UserGuard)
+  @Delete(':id')
+  deleteComment(@CurrentUser() user:User,@Param('id') id:string)
+  {
+    return this.commentService.delete(+user.id,+id)
   }
 }
