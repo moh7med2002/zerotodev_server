@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
 export class CommentUserDto {
     @Expose()
@@ -16,8 +16,9 @@ export class CommentDto {
     comment: string;
 
     @Expose()
-    created_at: Date;
+    createdAt: string;
 
     @Expose()
+    @Type(() => CommentUserDto)
     user: CommentUserDto;
 }
