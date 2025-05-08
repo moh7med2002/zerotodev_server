@@ -1,10 +1,42 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ArticleService } from './../article/article.service';
+import { QuestionService } from './../question/question.service';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { Comment } from './comment.entity';
+import { createCommentDto } from './dto/create-comment.dto';
+import { ItemStatus } from 'src/common/enums/itemStatus';
 
 @Injectable()
 export class CommentService {
     constructor(
         @Inject(repositories.comment_repository) private commentRepo:typeof Comment,
+        private readonly questionService:QuestionService,
+        private readonly articleService:ArticleService
     ){}
+    
+    async create(body:createCommentDto,userId:number)
+    {
+        const {questionId,articleId,comment} = body
+        if ((articleId && questionId) || (!articleId && !questionId)) {
+            throw new BadRequestException(
+                'يجب ربط الكومنت إما بمقالة أو سؤال، وليس بكليهما أو بدون أي منهما.'
+            );
+        }
+        if(articleId)
+        {
+            await this.articleService.getOne(articleId,ItemStatus.PUBLISHED)
+        }
+        else if(questionId)
+        {
+            await this.questionService.getOne(questionId,ItemStatus.PUBLISHED)
+        }
+        await this.commentRepo.create({
+            comment,
+            userId,
+            articleId,
+            questionId,
+        });
+        
+        return {message:"تم إضافة التعليق بنجاح"};
+    }
 }
