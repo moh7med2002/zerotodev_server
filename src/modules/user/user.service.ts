@@ -15,6 +15,7 @@ import { removeImage } from 'src/common/utils/removeImage';
 import { UserPoint } from '../user_point/user_point.entity';
 import { Quiz } from '../quiz/quiz.entity';
 import { Comment } from '../comment/comment.entity';
+import { Article } from '../article/article.entity';
 
 @Injectable()
 export class UserService {
@@ -146,5 +147,31 @@ export class UserService {
   getTopUsers(limit:number)
   {
     return this.userRepo.findAll({order: [['points', 'DESC']],limit})
+  }
+
+  async getUserStats(userId: number) {
+    const user = await this.userRepo.findByPk(userId, {
+      attributes: ['points'],
+      include: [
+        {
+          model: Comment,
+          attributes: ['id'],
+        },
+        {
+          model: Article,
+          attributes: ['id'],
+        },
+      ],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      points: user.points,
+      commentsCount: user.comments.length,
+      articleViewsCount: user.viewedArticles?.length || 0,
+    };
   }
 }

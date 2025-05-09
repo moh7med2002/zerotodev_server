@@ -106,4 +106,11 @@ export class UserController {
   {
     return this.userService.getTopUsers(20)
   }
+
+  @UseGuards(UserGuard)
+  @Get('stats')
+  getUserStats(@CurrentUser() user:User)
+  {
+    return this.userService.getUserStats(user.id)
+  }
 }
