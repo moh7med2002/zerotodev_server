@@ -13,10 +13,9 @@ import { UserPasswordDto } from './dto/user-password.dto';
 import { generateToken } from 'src/common/utils/generateToken';
 import { removeImage } from 'src/common/utils/removeImage';
 import { UserPoint } from '../user_point/user_point.entity';
-import { QuestionView } from '../question_view/question_view.entity';
-import { ArticleView } from '../article_view/article_view.entity';
 import { Quiz } from '../quiz/quiz.entity';
 import { Comment } from '../comment/comment.entity';
+import { Article } from '../article/article.entity';
 
 @Injectable()
 export class UserService {
@@ -143,5 +142,36 @@ export class UserService {
       throw new Error('هذا المستخدم غير موجود');
     }
     return user;
+  }
+
+  getTopUsers(limit:number)
+  {
+    return this.userRepo.findAll({order: [['points', 'DESC']],limit})
+  }
+
+  async getUserStats(userId: number) {
+    const user = await this.userRepo.findByPk(userId, {
+      attributes: ['points'],
+      include: [
+        {
+          model: Comment,
+          attributes: ['id'],
+        },
+        {
+          model: Article,
+          attributes: ['id'],
+        },
+      ],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      points: user.points,
+      commentsCount: user.comments.length,
+      articleViewsCount: user.viewedArticles?.length || 0,
+    };
   }
 }

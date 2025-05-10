@@ -5,6 +5,8 @@ import { repositories } from 'src/common/enums/repositories';
 import { Comment } from './comment.entity';
 import { createCommentDto } from './dto/create-comment.dto';
 import { ItemStatus } from 'src/common/enums/itemStatus';
+import { Article } from '../article/article.entity';
+import { Question } from '../question/question.entity';
 
 @Injectable()
 export class CommentService {
@@ -38,5 +40,25 @@ export class CommentService {
         });
         
         return {message:"تم إضافة التعليق بنجاح"};
+    }
+
+    async delete(userId:number,commentId:number)
+    {
+        const comment = await this.commentRepo.findByPk(commentId)
+        if(!comment || comment.userId!==userId)
+        {
+            throw new BadRequestException('غير مسموح لك بحذف التعليق')
+        }
+        await comment.destroy()
+        return {message:"تم حذف التعليق"}
+    }
+
+    getUserComments(userId:number)
+    {
+        return this.commentRepo.findAll({
+            where:{userId},
+            include:[{model:Article},{model:Question}]
+        }
+        )
     }
 }

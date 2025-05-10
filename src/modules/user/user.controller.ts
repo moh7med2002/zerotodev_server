@@ -27,6 +27,7 @@ import { MulterExceptionFilter } from 'src/common/filters/multerException.filter
 import { UserProfileDto } from './dto/user-profile.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { AdminUserProfileDto } from './dto/user-profile-admin.dto';
+import { TopUserDto } from './dto/top-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -97,5 +98,19 @@ export class UserController {
   @Get('admin/:userId')
   getAdminProfile(@Param('userId') userId: string) {
     return this.userService.getUserProfileForAdmin(+userId);
+  }
+
+  @Serilaize(TopUserDto)
+  @Get('top')
+  getTopUsers()
+  {
+    return this.userService.getTopUsers(20)
+  }
+
+  @UseGuards(UserGuard)
+  @Get('stats')
+  getUserStats(@CurrentUser() user:User)
+  {
+    return this.userService.getUserStats(user.id)
   }
 }
