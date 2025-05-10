@@ -128,7 +128,7 @@ export class UserService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
-      attributes: ['id', 'name', 'email', 'image', 'points'],
+      attributes: ['id', 'name', 'email', 'image', 'points', 'createdAt'],
     });
     return { users: rows, totalPages: Math.ceil(count / limit) };
   }
