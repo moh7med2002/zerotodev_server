@@ -57,7 +57,8 @@ export class CommentService {
     {
         return this.commentRepo.findAll({
             where:{userId},
-            include:[{model:Article},{model:Question}]
+            include:[{model:Article},{model:Question}],
+            order: [['createdAt', 'DESC']]
         }
         )
     }
