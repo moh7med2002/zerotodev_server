@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class createCommentDto{
     @IsOptional()
@@ -11,5 +11,6 @@ export class createCommentDto{
 
     @IsString()
     @IsNotEmpty()
+    @MaxLength(255, { message: 'يجب ألا يزيد التعليق عن 255 حرفًا' })
     comment:string
 }

@@ -97,6 +97,7 @@ export class ArticleService {
           model: Category,
         },
       ],
+      order: [[{ model: Comment ,as: 'comments'}, 'createdAt', 'DESC']],
     });
     if (!article) {
       throw new NotFoundException('المقالة غير متوفرة');

@@ -85,6 +85,7 @@ export class QuestionService {
           ],
         },
       ],
+      order: [[{ model: Comment ,as: 'comments'}, 'createdAt', 'DESC']],
     });
     if (!question) {
       throw new NotFoundException('المقالة غير متوفرة');

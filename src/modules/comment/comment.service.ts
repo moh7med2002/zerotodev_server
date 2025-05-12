@@ -48,10 +48,21 @@ export class CommentService {
     return { message: 'تم حذف التعليق' };
   }
 
+<<<<<<< HEAD
   async deleteByAdmin(commentId: number) {
     const comment = await this.commentRepo.findByPk(commentId);
     if (!comment) {
       throw new BadRequestException('غير مسموح لك بحذف التعليق');
+=======
+    getUserComments(userId:number)
+    {
+        return this.commentRepo.findAll({
+            where:{userId},
+            include:[{model:Article},{model:Question}],
+            order: [['createdAt', 'DESC']]
+        }
+        )
+>>>>>>> 5d47ec05d88a1b666df6432c39aaef2ccf64afa4
     }
     await comment.destroy();
     return { message: 'تم حذف التعليق' };
