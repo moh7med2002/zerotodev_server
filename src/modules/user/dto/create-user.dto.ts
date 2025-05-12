@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import {IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class createUserDto {
     @IsEmail()
@@ -15,5 +15,6 @@ export class createUserDto {
 
     @IsOptional()
     @IsString()
+    @MaxLength(255, { message: 'يجب ألا يزيد البيو عن 255 حرفًا' })
     bio:string
 }
