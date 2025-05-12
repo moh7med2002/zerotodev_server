@@ -98,11 +98,20 @@ export class ArticleController {
   @Serilaize(DetailedArticleDto)
   @UseGuards(OptionalUserGuard)
   @Get(':id')
-  getSingleArticle(@Param('id') id:string,@CurrentUser() user:User | null,@Req() req)
-  {
-    return this.articleService.getOneWithTracking(+id, user, req.ip,ItemStatus.PUBLISHED);
+  getSingleArticle(
+    @Param('id') id: string,
+    @CurrentUser() user: User | null,
+    @Req() req,
+  ) {
+    return this.articleService.getOneWithTracking(
+      +id,
+      user,
+      req.ip,
+      ItemStatus.PUBLISHED,
+    );
   }
 
+  @Serilaize(DetailedArticleDto)
   @UseGuards(AdminGuard)
   @Get('/admin/:articleId')
   getArticleDetailForAdmin(@Param('articleId') articleId: string) {

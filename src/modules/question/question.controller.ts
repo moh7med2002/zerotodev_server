@@ -1,4 +1,15 @@
-import {Body,Controller,Get,Param,Patch,Post,Put,Query,Req,UseGuards,} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { createQuestionDto } from './dto/create-question.dto';
@@ -88,6 +99,7 @@ export class QuestionController {
     return this.questionService.updateStatus(+questionId, dto);
   }
 
+  @Serilaize(DetailedQuestionDto)
   @UseGuards(AdminGuard)
   @Get('/admin/:questionId')
   getQuestionDetailsForAdmin(@Param('questionId') questionId: string) {
