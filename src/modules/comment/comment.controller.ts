@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { UserGuard } from 'src/guards/user.guard';
 import { createCommentDto } from './dto/create-comment.dto';
@@ -32,4 +32,14 @@ export class CommentController {
   {
     return this.commentService.getUserComments(+user.id)
   }
+
+  @Get(':itemId')
+  getComments(
+  @Param('itemId') itemId: string,
+  @Query('page') page: string = '1',
+  @Query('limit') limit: string = '10',
+  @Query('type') type: 'article' | 'question'
+) {
+  return this.commentService.getCommentsByItemId(+page, +limit, itemId, type);
+}
 }

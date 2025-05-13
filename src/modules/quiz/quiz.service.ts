@@ -178,7 +178,6 @@ export class QuizService {
   async submitQuiz(userId:number,body:SubmitQuizDto)
   {
     const {quizId,answers} = body
-      // 1. Fetch quiz with questions and check if it applied
       const quiz = await this.getQuizWithQuestionsForUser(quizId,userId);
       const totalQuestions = quiz.questions.length;
     

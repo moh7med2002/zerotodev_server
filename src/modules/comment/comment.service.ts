@@ -7,6 +7,7 @@ import { createCommentDto } from './dto/create-comment.dto';
 import { ItemStatus } from 'src/common/enums/itemStatus';
 import { Article } from '../article/article.entity';
 import { Question } from '../question/question.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class CommentService {
@@ -61,5 +62,33 @@ export class CommentService {
             order: [['createdAt', 'DESC']]
         }
         )
+    }
+
+    async getCommentsByItemId(page: number,limit: number,itemId: string,type: 'article' | 'question') 
+    {
+        const offset = (page - 1) * limit;
+
+        const whereCondition = type === 'article'
+            ? { articleId: itemId }
+            : { questionId: itemId };
+
+        const { rows, count } = await this.commentRepo.findAndCountAll({
+            where: whereCondition,
+            limit,
+            offset,
+            order: [['createdAt', 'DESC']],
+            attributes: ['id', 'comment','createdAt'],
+            include: [
+            {
+                model: User,
+                attributes: ['id', 'name'],
+            },
+            ],
+        });
+
+        return {
+            comments: rows,
+            totalPages: Math.ceil(count / limit),
+        };
     }
 }

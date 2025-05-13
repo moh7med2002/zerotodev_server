@@ -8,6 +8,6 @@ import { ArticleModule } from '../article/article.module';
 @Module({
   controllers: [CommentController],
   providers: [CommentService,...CommentProvider],
-  imports:[QuestionModule,ArticleModule]
+  imports:[QuestionModule,ArticleModule],
 })
 export class CommentModule {}

@@ -81,7 +81,7 @@ export class QuestionController {
 
   @UseGuards(AdminGuard)
   @Patch('/update/:questionId/status')
-  updateArticleStatus(
+  updateQuestionStatus(
     @Body() dto: UpdateQuestionStatusDto,
     @Param('questionId') questionId: string,
   ) {
