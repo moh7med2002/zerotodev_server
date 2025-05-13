@@ -136,6 +136,16 @@ export class QuestionService {
   async getQuestion(questionId: number) {
     const question = await this.questionRepo.findOne({
       where: { id: questionId },
+      include: [
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+            },
+          ],
+        },
+      ],
     });
     if (!question) {
       throw new BadRequestException('السؤال غير موجود');
