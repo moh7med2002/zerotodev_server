@@ -99,7 +99,11 @@ export class ArticleService {
     },
   });
 
-  const result = article?.toJSON();
+  if (!article) {
+      throw new NotFoundException('المقالة غير متوفر');
+    }
+
+  const result = article.toJSON();
   result.commentCount = article?.get('commentCount');
   return result;
   }

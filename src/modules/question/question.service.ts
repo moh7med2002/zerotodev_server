@@ -95,7 +95,7 @@ export class QuestionService {
       },
     });
     if (!question) {
-      throw new NotFoundException('المقالة غير متوفرة');
+      throw new NotFoundException('السؤال غير متوفر');
     }
     const result = question.toJSON();
     result.commentCount = question.get('commentCount');
