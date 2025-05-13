@@ -25,11 +25,13 @@ export class CommentService {
         'يجب ربط الكومنت إما بمقالة أو سؤال، وليس بكليهما أو بدون أي منهما.',
       );
     }
+
     if (articleId) {
       await this.articleService.getOne(articleId, ItemStatus.PUBLISHED);
     } else if (questionId) {
       await this.questionService.getOne(questionId, ItemStatus.PUBLISHED);
     }
+
     await this.commentRepo.create({
       comment,
       userId,
@@ -52,41 +54,41 @@ export class CommentService {
   async deleteByAdmin(commentId: number) {
     const comment = await this.commentRepo.findByPk(commentId);
     if (!comment) {
-      throw new BadRequestException('غير مسموح لك بحذف التعليق');
+      throw new BadRequestException('التعليق غير موجود');
     }
-<<<<<<< HEAD
-
-    async getCommentsByItemId(page: number,limit: number,itemId: string,type: 'article' | 'question') 
-    {
-        const offset = (page - 1) * limit;
-
-        const whereCondition = type === 'article'
-            ? { articleId: itemId }
-            : { questionId: itemId };
-
-        const { rows, count } = await this.commentRepo.findAndCountAll({
-            where: whereCondition,
-            limit,
-            offset,
-            order: [['createdAt', 'DESC']],
-            attributes: ['id', 'comment','createdAt'],
-            include: [
-            {
-                model: User,
-                attributes: ['id', 'name'],
-            },
-            ],
-        });
-
-        return {
-            comments: rows,
-            totalPages: Math.ceil(count / limit),
-        };
-    }
-}
-=======
     await comment.destroy();
     return { message: 'تم حذف التعليق' };
+  }
+
+  async getCommentsByItemId(
+    page: number,
+    limit: number,
+    itemId: string,
+    type: 'article' | 'question',
+  ) {
+    const offset = (page - 1) * limit;
+
+    const whereCondition =
+      type === 'article' ? { articleId: itemId } : { questionId: itemId };
+
+    const { rows, count } = await this.commentRepo.findAndCountAll({
+      where: whereCondition,
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: ['id', 'comment', 'createdAt'],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    return {
+      comments: rows,
+      totalPages: Math.ceil(count / limit),
+    };
   }
 
   getUserComments(userId: number) {
@@ -96,4 +98,3 @@ export class CommentService {
     });
   }
 }
->>>>>>> 7b22eae888bf215f71718c32198e3168471f6924

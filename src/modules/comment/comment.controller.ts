@@ -1,16 +1,4 @@
-<<<<<<< HEAD
 import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
-=======
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
->>>>>>> 7b22eae888bf215f71718c32198e3168471f6924
 import { CommentService } from './comment.service';
 import { UserGuard } from 'src/guards/user.guard';
 import { createCommentDto } from './dto/create-comment.dto';
