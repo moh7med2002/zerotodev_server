@@ -183,37 +183,23 @@ export class QuizService {
     return this.quizRepo.count();
   }
 
-  async submitQuiz(userId: number, body: SubmitQuizDto) {
-    const { quizId, answers } = body;
-    // 1. Fetch quiz with questions and check if it applied
-    const quiz = await this.getQuizWithQuestionsForUser(quizId, userId);
-    const totalQuestions = quiz.questions.length;
-
-    const submittedAnswers =
-      await this.quizAnswerService.getSubmittedAnswers(answers);
-    this.quizAnswerService.validateSubmittedAnswers(
-      submittedAnswers,
-      totalQuestions,
-    );
-
-    const correctCount =
-      this.quizAnswerService.countCorrectAnswers(submittedAnswers);
-    await this.userQuizService.saveUserQuizResult(
-      userId,
-      quizId,
-      correctCount,
-      totalQuestions,
-    );
-    await this.userPointService.givePointForQuizSubmittion(
-      userId,
-      quizId,
-      correctCount,
-    );
-
-    return {
-      totalQuestions,
-      correctAnswers: correctCount,
-      score: `${correctCount} / ${totalQuestions}`,
-    };
-  }
+  async submitQuiz(userId:number,body:SubmitQuizDto)
+  {
+    const {quizId,answers} = body
+      const quiz = await this.getQuizWithQuestionsForUser(quizId,userId);
+      const totalQuestions = quiz.questions.length;
+    
+      const submittedAnswers = await this.quizAnswerService.getSubmittedAnswers(answers);
+      this.quizAnswerService.validateSubmittedAnswers(submittedAnswers, totalQuestions);
+    
+      const correctCount = this.quizAnswerService.countCorrectAnswers(submittedAnswers);
+      await this.userQuizService.saveUserQuizResult(userId, quizId, correctCount,totalQuestions);
+      await this.userPointService.givePointForQuizSubmittion(userId,quizId,correctCount)
+    
+      return {
+        totalQuestions,
+        correctAnswers: correctCount,
+        score: `${correctCount} / ${totalQuestions}`,
+      };
+    }
 }
