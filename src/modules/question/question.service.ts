@@ -13,6 +13,7 @@ import { Comment } from '../comment/comment.entity';
 import { UserPointService } from '../user_point/user_point.service';
 import { CurrentUserPayload } from 'src/common/types/current-user.type';
 import { UpdateQuestionStatusDto } from './dto/update-question-status.dto';
+import { Sequelize } from 'sequelize';
 
 @Injectable()
 export class QuestionService {
@@ -78,19 +79,27 @@ export class QuestionService {
       include: [
         {
           model: Comment,
-          include: [
-            {
-              model: User,
-            },
-          ],
         },
       ],
-      order: [[{ model: Comment ,as: 'comments'}, 'createdAt', 'DESC']],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`(
+            SELECT COUNT(*) 
+            FROM comments AS a 
+            WHERE a.questionId = Question.id
+            )`),
+            'commentCount',
+          ],
+        ],
+      },
     });
     if (!question) {
-      throw new NotFoundException('المقالة غير متوفرة');
+      throw new NotFoundException('السؤال غير متوفر');
     }
-    return question;
+    const result = question.toJSON();
+    result.commentCount = question.get('commentCount');
+    return result;
   }
 
   async getOneWithTracking(

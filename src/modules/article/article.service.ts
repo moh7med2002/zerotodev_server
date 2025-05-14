@@ -1,11 +1,6 @@
 import { ArticleViewService } from './../article_view/article_view.service';
 import { CategoryService } from './../category/category.service';
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import {BadRequestException,Inject,Injectable,NotFoundException,} from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { Article } from './article.entity';
 import { createArtcileDto } from './dto/create-article.dto';
@@ -15,6 +10,7 @@ import { User } from '../user/entities/user.entity';
 import { UserPointService } from '../user_point/user_point.service';
 import { removeImage } from 'src/common/utils/removeImage';
 import { UpdateArtcileStatusDto } from './dto/update-article-status.dto';
+import { Sequelize } from 'sequelize';
 
 @Injectable()
 export class ArticleService {
@@ -80,46 +76,44 @@ export class ArticleService {
 
   async getOne(id: number, status?: string) {
     const article = await this.articleRepo.findOne({
-      where: {
-        ...(status && { status }),
-        id,
+    where: {...(status && { status }),id,},
+    include: [
+      {
+        model: Comment,
       },
+      {
+        model: Category,
+      },
+    ],
+    attributes: {
       include: [
-        {
-          model: Comment,
-          include: [
-            {
-              model: User,
-            },
-          ],
-        },
-        {
-          model: Category,
-        },
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*) 
+            FROM comments AS a 
+            WHERE a.articleId = Article.id
+          )`),
+          'commentCount',
+        ],
       ],
-      order: [[{ model: Comment ,as: 'comments'}, 'createdAt', 'DESC']],
-    });
-    if (!article) {
-      throw new NotFoundException('المقالة غير متوفرة');
+    },
+  });
+
+  if (!article) {
+      throw new NotFoundException('المقالة غير متوفر');
     }
-    return article;
+
+  const result = article.toJSON();
+  result.commentCount = article?.get('commentCount');
+  return result;
   }
 
-  async getOneWithTracking(
-    id: number,
-    user: User | null,
-    ip: string,
-    status: string,
-  ) {
+  async getOneWithTracking(id: number,user: User | null,ip: string,status: string) 
+  {
     const article = await this.getOne(id, status);
-    const alreadyViewed = await this.articleViewService.registerView(
-      id,
-      user,
-      ip,
-    );
+    const alreadyViewed = await this.articleViewService.registerView(id,user,ip);
     if (!alreadyViewed) {
-      article.views++;
-      article.save();
+      await this.articleRepo.increment('views', { by: 1, where: { id } });
       if (user) {
         await this.userPointService.givePointForArticleRead(user.id, id);
       }

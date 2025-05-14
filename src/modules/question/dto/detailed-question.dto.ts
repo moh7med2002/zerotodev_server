@@ -1,5 +1,4 @@
-import { Expose, Type } from 'class-transformer';
-import { CommentDto } from 'src/modules/comment/dto/comment.dto';
+import { Expose } from 'class-transformer';
 
 export class DetailedQuestionDto {
     @Expose()
@@ -24,6 +23,5 @@ export class DetailedQuestionDto {
     views: number;
 
     @Expose()
-    @Type(() => CommentDto)
-    comments: CommentDto[];
+    commentCount: number;
 }
