@@ -194,4 +194,4 @@ export class QuizService {
         score: `${correctCount} / ${totalQuestions}`,
       };
     }
-}
+} 
