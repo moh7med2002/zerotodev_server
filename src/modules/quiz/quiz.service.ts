@@ -58,6 +58,14 @@ export class QuizService {
                       )`),
             'quistionCount',
           ],
+          [
+            Sequelize.literal(`(
+                        SELECT COUNT(*) 
+                        FROM user_quiz AS a 
+                        WHERE a.quizId = Quiz.id
+                      )`),
+            'userCount',
+          ],
         ],
       },
     });
@@ -126,7 +134,7 @@ export class QuizService {
   async findOneForUser(id: number, userId: number) {
     const quiz = await this.quizRepo.findOne({
       where: { status: ItemStatus.PUBLISHED, id },
-      raw:true,
+      raw: true,
       attributes: {
         include: [
           [
@@ -194,4 +202,4 @@ export class QuizService {
         score: `${correctCount} / ${totalQuestions}`,
       };
     }
-} 
+}

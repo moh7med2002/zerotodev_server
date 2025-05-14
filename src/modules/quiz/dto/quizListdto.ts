@@ -15,6 +15,9 @@ export class QuizListDto {
 
   @Expose({ name: 'quistionCount' })
   questionCount: number;
+
+  @Expose({ name: 'userCount' })
+  userCount: number;
 }
 
 export class QuizListResponseDto {

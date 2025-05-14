@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UserQuizService } from './user_quiz.service';
 import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
 import { UserQuizDto } from './dto/user-quiz.dto';
@@ -9,11 +9,16 @@ import { User } from '../user/entities/user.entity';
 @Controller('user-quiz')
 export class UserQuizController {
   constructor(private readonly userQuizService: UserQuizService) {}
-    @Serilaize(UserQuizDto)
-    @UseGuards(UserGuard)
-    @Get('all')
-    getUserQuizes(@CurrentUser() user:User)
-    {
-        return this.userQuizService.getUserQuizes(user.id)
-    }
+  @Serilaize(UserQuizDto)
+  @UseGuards(UserGuard)
+  @Get('all')
+  getUserQuizes(@CurrentUser() user: User) {
+    return this.userQuizService.getUserQuizes(user.id);
+  }
+
+  @Serilaize(UserQuizDto)
+  @Get('/:quizId/users')
+  getQuizUsers(@Param('quizId') quizId: string) {
+    return this.userQuizService.getQuizUsers(+quizId);
+  }
 }

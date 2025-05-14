@@ -15,6 +15,8 @@ import { UserPointModule } from './modules/user_point/user_point.module';
 import { QuestionViewModule } from './modules/question_view/question_view.module';
 import { ArticleViewModule } from './modules/article_view/article_view.module';
 import { CommentModule } from './modules/comment/comment.module';
+import { SkillModule } from './modules/skill/skill.module';
+import { SocialMediaModule } from './modules/social-media/social-media.module';
 
 @Module({
     imports: [
@@ -34,6 +36,8 @@ import { CommentModule } from './modules/comment/comment.module';
         ArticleViewModule,
         QuestionViewModule,
         UserPointModule,
+        SkillModule,
+        SocialMediaModule,
     ]
 })
 export class AppModule {}
