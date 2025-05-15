@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   UseGuards,
@@ -29,5 +30,13 @@ export class SocialMediaController {
   @Delete('/:skillId')
   deleteSkill(@Param('skillId') skillId: string, @CurrentUser() user: User) {
     return this.socialMediaService.deleteSkocialMedia(+skillId, user.id);
+  }
+
+  @Serilaize(SocialMediaDto)
+  @UseGuards(UserGuard)
+  @Get()
+  getAllSocialByUser(@CurrentUser() user:User)
+  {
+    return this.socialMediaService.getAllByUser(user.id)
   }
 }

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   UseGuards,
@@ -29,5 +30,13 @@ export class SkillController {
   @Delete('/:skillId')
   deleteSkill(@Param('skillId') skillId: string, @CurrentUser() user: User) {
     return this.skillService.deleteSkill(+skillId, user.id);
+  }
+
+  @Serilaize(SkillDto)
+  @UseGuards(UserGuard)
+  @Get()
+  getAllSocialByUser(@CurrentUser() user:User)
+  {
+    return this.skillService.getAllByUser(user.id)
   }
 }

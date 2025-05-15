@@ -24,4 +24,9 @@ export class SocialMediaService {
     });
     return socialMedia?.destroy();
   }
+
+  getAllByUser(userId:number)
+  {
+    return this.socialMediaRepo.findAll({where:{userId}})
+  }
 }

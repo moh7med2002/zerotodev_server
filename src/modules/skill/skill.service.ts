@@ -18,4 +18,9 @@ export class SkillService {
     const skill = await this.skillRepo.findOne({ where: { id, userId } });
     return skill?.destroy();
   }
+
+  getAllByUser(userId:number)
+  {
+    return this.skillRepo.findAll({where:{userId}})
+  }
 }
