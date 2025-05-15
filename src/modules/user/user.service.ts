@@ -16,6 +16,9 @@ import { UserPoint } from '../user_point/user_point.entity';
 import { Quiz } from '../quiz/quiz.entity';
 import { Comment } from '../comment/comment.entity';
 import { Article } from '../article/article.entity';
+import { SocailMedia } from '../social-media/social-media.entity';
+import { Skill } from '../skill/skill.entity';
+import { Question } from '../question/question.entity';
 
 @Injectable()
 export class UserService {
@@ -173,5 +176,38 @@ export class UserService {
       commentsCount: user.comments.length,
       articleViewsCount: user.viewedArticles?.length || 0,
     };
+  }
+
+  async getUserPublicProfile(id:number)
+  {
+    const user = await this.userRepo.findOne({
+    where: { id },
+    include: [
+      { model: Comment},
+      {
+        model: Article,
+        as: 'viewedArticles',
+      },
+      {
+        model: Question,
+        as: 'viewedQuestions',
+      },
+      { model: Skill },
+      { model: SocailMedia },
+      { model: UserPoint},
+    ],
+  });
+
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+
+  return {
+    ...user.get({ plain: true }),
+    commentsCount: user.comments?.length || 0,
+    articlesViewed: user.viewedArticles?.length || 0,
+    questionsViewed: user.viewedQuestions?.length || 0,
+    pointsHistoryCount: user.pointsHistory?.length || 0,
+  };
   }
 }

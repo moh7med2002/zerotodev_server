@@ -28,6 +28,7 @@ import { UserProfileDto } from './dto/user-profile.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { AdminUserProfileDto } from './dto/user-profile-admin.dto';
 import { TopUserDto } from './dto/top-user.dto';
+import { UserPublicProfileDto } from './dto/user-public-profile.dto';
 
 @Controller('user')
 export class UserController {
@@ -112,5 +113,12 @@ export class UserController {
   getUserStats(@CurrentUser() user:User)
   {
     return this.userService.getUserStats(user.id)
+  }
+
+  @Serilaize(UserPublicProfileDto)
+  @Get('profile/:id')
+  getUserPublicProfile(@Param('id') id:string)
+  {
+    return this.userService.getUserPublicProfile(+id)
   }
 }
