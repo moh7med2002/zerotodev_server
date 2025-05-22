@@ -103,22 +103,19 @@ export class UserController {
 
   @Serilaize(TopUserDto)
   @Get('top')
-  getTopUsers()
-  {
-    return this.userService.getTopUsers(20)
+  getTopUsers() {
+    return this.userService.getTopUsers(20);
   }
 
   @UseGuards(UserGuard)
   @Get('stats')
-  getUserStats(@CurrentUser() user:User)
-  {
-    return this.userService.getUserStats(user.id)
+  getUserStats(@CurrentUser() user: User) {
+    return this.userService.getUserStats(user.id);
   }
 
   @Serilaize(UserPublicProfileDto)
   @Get('profile/:id')
-  getUserPublicProfile(@Param('id') id:string)
-  {
-    return this.userService.getUserPublicProfile(+id)
+  getUserPublicProfile(@Param('id') id: string) {
+    return this.userService.getUserPublicProfile(+id);
   }
 }
