@@ -183,36 +183,35 @@ export class UserService {
     };
   }
 
-    async getUserPublicProfile(id: number) {
-      const user = await this.userRepo.findOne({
-        where: { id },
-        include: [
-          { model: Comment },
-          {
-            model: Article,
-            as: 'viewedArticles',
-          },
-          {
-            model: Question,
-            as: 'viewedQuestions',
-          },
-          { model: Skill },
-          { model: SocailMedia },
-          { model: UserPoint },
-        ],
-      });
+  async getUserPublicProfile(id: number) {
+    const user = await this.userRepo.findOne({
+      where: { id },
+      include: [
+        { model: Comment },
+        {
+          model: Article,
+          as: 'viewedArticles',
+        },
+        {
+          model: Question,
+          as: 'viewedQuestions',
+        },
+        { model: Skill },
+        { model: SocailMedia },
+        { model: UserPoint },
+      ],
+    });
 
-      if (!user) {
-        throw new NotFoundException('User not found');
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-      return {
-        ...user.get({ plain: true }),
-        commentsCount: user.comments?.length || 0,
-        articlesViewed: user.viewedArticles?.length || 0,
-        questionsViewed: user.viewedQuestions?.length || 0,
-        pointsHistoryCount: user.pointsHistory?.length || 0,
-      };
-    }
+    return {
+      ...user.get({ plain: true }),
+      commentsCount: user.comments?.length || 0,
+      articlesViewed: user.viewedArticles?.length || 0,
+      questionsViewed: user.viewedQuestions?.length || 0,
+      pointsHistoryCount: user.pointsHistory?.length || 0,
+    };
   }
 }
