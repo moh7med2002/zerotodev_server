@@ -115,7 +115,7 @@ export class ArticleController {
   @UseGuards(AdminGuard)
   @Get('/admin/:articleId')
   getArticleDetailForAdmin(@Param('articleId') articleId: string) {
-    return this.articleService.getOne(+articleId);
+    return this.articleService.getOneForAdmin(+articleId);
   }
 
   @UseGuards(AdminGuard)

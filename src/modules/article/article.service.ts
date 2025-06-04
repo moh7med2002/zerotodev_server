@@ -1,6 +1,11 @@
 import { ArticleViewService } from './../article_view/article_view.service';
 import { CategoryService } from './../category/category.service';
-import {BadRequestException,Inject,Injectable,NotFoundException,} from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { repositories } from 'src/common/enums/repositories';
 import { Article } from './article.entity';
 import { createArtcileDto } from './dto/create-article.dto';
@@ -76,42 +81,69 @@ export class ArticleService {
 
   async getOne(id: number, status?: string) {
     const article = await this.articleRepo.findOne({
-    where: {...(status && { status }),id,},
-    include: [
-      {
-        model: Comment,
-      },
-      {
-        model: Category,
-      },
-    ],
-    attributes: {
+      where: { ...(status && { status }), id },
       include: [
-        [
-          Sequelize.literal(`(
+        {
+          model: Comment,
+        },
+        {
+          model: Category,
+        },
+      ],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`(
             SELECT COUNT(*) 
             FROM comments AS a 
             WHERE a.articleId = Article.id
           )`),
-          'commentCount',
+            'commentCount',
+          ],
         ],
-      ],
-    },
-  });
+      },
+    });
 
-  if (!article) {
+    if (!article) {
       throw new NotFoundException('المقالة غير متوفر');
     }
-
-  const result = article.toJSON();
-  result.commentCount = article?.get('commentCount');
-  return result;
+    const result = article.toJSON();
+    result.commentCount = article?.get('commentCount');
+    return result;
   }
 
-  async getOneWithTracking(id: number,user: User | null,ip: string,status: string) 
-  {
+  async getOneForAdmin(id: number) {
+    const article = await this.articleRepo.findOne({
+      where: { id },
+      include: [
+        {
+          model: Comment,
+          include: [{ model: User }],
+        },
+        {
+          model: Category,
+        },
+      ],
+    });
+
+    if (!article) {
+      throw new NotFoundException('المقالة غير متوفر');
+    }
+    return article;
+  }
+
+  async getOneWithTracking(
+    id: number,
+    user: User | null,
+    ip: string,
+    status: string,
+  ) {
     const article = await this.getOne(id, status);
-    const alreadyViewed = await this.articleViewService.registerView(id,user,ip);
+    const alreadyViewed = await this.articleViewService.registerView(
+      id,
+      user,
+      ip,
+    );
     if (!alreadyViewed) {
       await this.articleRepo.increment('views', { by: 1, where: { id } });
       if (user) {

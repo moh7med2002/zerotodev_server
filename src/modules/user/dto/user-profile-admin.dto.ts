@@ -1,4 +1,6 @@
 import { Exclude, Expose, Type } from 'class-transformer';
+import { SkillDto } from 'src/modules/skill/dto/skill.dto';
+import { SocialMediaDto } from 'src/modules/social-media/dto/social-media.dto';
 
 export class UserQuiz {
   @Expose()
@@ -37,6 +39,14 @@ export class AdminUserProfileDto {
   @Expose()
   @Type(() => QuizWithUserQuizDto)
   quizzes: QuizWithUserQuizDto[];
+
+  @Expose()
+  @Type(() => SkillDto)
+  skills: SkillDto[];
+
+  @Expose()
+  @Type(() => SocialMediaDto)
+  socialmedias: SocialMediaDto[];
 }
 
 @Exclude()

@@ -139,7 +139,13 @@ export class UserService {
   async getUserProfileForAdmin(userId: number) {
     const user = await this.userRepo.findOne({
       where: { id: userId },
-      include: [{ model: Comment }, { model: UserPoint }, { model: Quiz }],
+      include: [
+        { model: Comment },
+        { model: UserPoint },
+        { model: Quiz },
+        { model: Skill },
+        { model: SocailMedia },
+      ],
     });
     if (!user) {
       throw new Error('هذا المستخدم غير موجود');
@@ -147,9 +153,8 @@ export class UserService {
     return user;
   }
 
-  getTopUsers(limit:number)
-  {
-    return this.userRepo.findAll({order: [['points', 'DESC']],limit})
+  getTopUsers(limit: number) {
+    return this.userRepo.findAll({ order: [['points', 'DESC']], limit });
   }
 
   async getUserStats(userId: number) {
@@ -178,36 +183,35 @@ export class UserService {
     };
   }
 
-  async getUserPublicProfile(id:number)
-  {
+  async getUserPublicProfile(id: number) {
     const user = await this.userRepo.findOne({
-    where: { id },
-    include: [
-      { model: Comment},
-      {
-        model: Article,
-        as: 'viewedArticles',
-      },
-      {
-        model: Question,
-        as: 'viewedQuestions',
-      },
-      { model: Skill },
-      { model: SocailMedia },
-      { model: UserPoint},
-    ],
-  });
+      where: { id },
+      include: [
+        { model: Comment },
+        {
+          model: Article,
+          as: 'viewedArticles',
+        },
+        {
+          model: Question,
+          as: 'viewedQuestions',
+        },
+        { model: Skill },
+        { model: SocailMedia },
+        { model: UserPoint },
+      ],
+    });
 
-  if (!user) {
-    throw new NotFoundException('المستخدم غير متوفر');
-  }
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-  return {
-    ...user.get({ plain: true }),
-    commentsCount: user.comments?.length || 0,
-    articlesViewed: user.viewedArticles?.length || 0,
-    questionsViewed: user.viewedQuestions?.length || 0,
-    pointsHistoryCount: user.pointsHistory?.length || 0,
-  };
+    return {
+      ...user.get({ plain: true }),
+      commentsCount: user.comments?.length || 0,
+      articlesViewed: user.viewedArticles?.length || 0,
+      questionsViewed: user.viewedQuestions?.length || 0,
+      pointsHistoryCount: user.pointsHistory?.length || 0,
+    };
   }
 }
