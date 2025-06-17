@@ -115,8 +115,7 @@ export class QuestionService {
       ip,
     );
     if (!alreadyViewed) {
-      question.views++;
-      question.save();
+      await this.questionRepo.increment('views', { by: 1, where: { id } });
       if (user) {
         await this.userPointService.givePointForQuestionRead(user.id, id);
       }
