@@ -8,7 +8,7 @@ class RelatedEntityDto {
     title: string;
 }
 
-    export class UserPointDto {
+export class UserPointDto {
     @Expose()
     id: number;
 
@@ -32,4 +32,4 @@ class RelatedEntityDto {
     @Expose()
     @Type(() => RelatedEntityDto)
     quiz?: RelatedEntityDto;
-} 
+}

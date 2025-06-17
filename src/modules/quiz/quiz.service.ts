@@ -194,7 +194,7 @@ export class QuizService {
     
       const correctCount = this.quizAnswerService.countCorrectAnswers(submittedAnswers);
       await this.userQuizService.saveUserQuizResult(userId, quizId, correctCount,totalQuestions);
-      await this.userPointService.givePointForQuizSubmittion(userId,quizId,correctCount)
+      await this.userPointService.givePointForQuizSubmission(userId,quizId,correctCount)
     
       return {
         totalQuestions,

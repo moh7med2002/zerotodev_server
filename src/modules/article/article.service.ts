@@ -33,7 +33,7 @@ export class ArticleService {
     const article = await this.articleRepo.create({ ...body });
     return article;
   }
- 
+
   async getAll(
     page: number,
     limit: number,

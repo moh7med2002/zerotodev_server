@@ -13,51 +13,47 @@ export class UserPointService {
         @Inject(repositories.user_point_repository) private userPointRepo:typeof UserPoint,
         private userService:UserService
     ){}
-    async givePointForArticleRead(userId: number, articleId: number) {
-        await this.userService.increasePoint(userId,Points.article)
+    private async addPoints(userId: number, points: number, activityTitle: string, extraData?: object) {
+        await this.userService.increasePoint(userId, points);
         await this.userPointRepo.create({
             date: new Date(),
-            points: Points.article,
+            points,
             userId,
-            articleId,
-            activity_title: 'قراءة مقالة',
-        });
-    }
-    async givePointForQuestionRead(userId: number, questionId: number) {
-        await this.userService.increasePoint(userId,Points.question)
-        await this.userPointRepo.create({
-            date: new Date(),
-            points: Points.question,
-            userId,
-            questionId,
-            activity_title: 'قراءة سؤال',
+            activity_title: activityTitle,
+            ...extraData,
         });
     }
 
-    async givePointForQuizSubmittion(userId: number, quizId: number,quizMark:number) {
-        if(quizMark!==0)
-        {
-            await this.userService.increasePoint(userId,Points.answer * quizMark)
-            await this.userPointRepo.create({
-                date: new Date(),
-                points: Points.answer * quizMark,
-                userId,
-                quizId,
-                activity_title: 'إنهاء كويز',
-            });
+    async givePointForArticleRead(userId: number, articleId: number) {
+        await this.addPoints(userId, Points.article, 'قراءة مقالة', { articleId });
+    }
+
+    async givePointForQuestionRead(userId: number, questionId: number) {
+        await this.addPoints(userId, Points.question, 'قراءة سؤال', { questionId });
+    }
+
+    async givePointForQuizSubmission(userId: number, quizId: number, quizMark: number) {
+        if (quizMark > 0) {
+            await this.addPoints(userId, Points.answer * quizMark, 'إنهاء كويز', { quizId });
         }
     }
 
-    getUserPoints(userId:number)
-    {
-        return this.userPointRepo.findAll({
+    async getUserPoints(userId: number, page: number, limit: number) {
+        const offset = (page - 1) * limit;
+        const { rows, count } = await this.userPointRepo.findAndCountAll({
             where: { userId },
             include: [
-                {model:Article},
-                {model:Question},
-                {model:Quiz}
+            { model: Article },
+            { model: Question },
+            { model: Quiz }
             ],
             order: [['date', 'DESC']],
+            limit,
+            offset,
         });
+        return {
+            points: rows,
+            totalPages: Math.ceil(count / limit),
+        };
     }
 }
