@@ -49,6 +49,10 @@ export class User extends Model {
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   points: number;
 
+  @AllowNull(false)
+  @Column({ type: DataType.BOOLEAN, defaultValue: true })
+  active: boolean;
+
   // Relationship: A user can prepare many quizzes
   @BelongsToMany(() => Quiz, () => UserQuiz)
   quizzes: Quiz[];

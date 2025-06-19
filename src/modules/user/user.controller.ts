@@ -118,4 +118,9 @@ export class UserController {
   getUserPublicProfile(@Param('id') id: string) {
     return this.userService.getUserPublicProfile(+id);
   }
+
+  @Put('/active/:userId')
+  changeUserActiveStatus(@Param('userId') userId: string) {
+    return this.userService.chnageUserActiveStatus(+userId);
+  }
 }

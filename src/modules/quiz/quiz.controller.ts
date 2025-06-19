@@ -24,6 +24,7 @@ import { User } from '../user/entities/user.entity';
 import { QuizUserViewResponseDto } from './dto/quiz-user-view.dto';
 import { QuizWithQuestionsDto } from './dto/quiz-with-questions.dto';
 import { SubmitQuizDto } from './dto/submit-quiz.dot';
+import { ActiveUserGuard } from 'src/guards/active.user.guard';
 
 @Controller('quiz')
 export class QuizController {
@@ -83,24 +84,23 @@ export class QuizController {
   @Serilaize(QuizUserViewResponseDto)
   @UseGuards(UserGuard)
   @Get('user/:quizId')
-  getQuizForUser(@Param('quizId') id:string,@CurrentUser() user:User)
-  {
-    return this.quizService.findOneForUser(+id,+user.id)
+  getQuizForUser(@Param('quizId') id: string, @CurrentUser() user: User) {
+    return this.quizService.findOneForUser(+id, +user.id);
   }
 
   @Serilaize(QuizWithQuestionsDto)
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, ActiveUserGuard)
   @Get('user/:quizId/questions')
-  getQuizWithQuestionsForUser
-  (@Param('quizId') id:string,@CurrentUser() user:User)
-  {
-    return this.quizService.getQuizWithQuestionsForUser(+id,+user.id)
+  getQuizWithQuestionsForUser(
+    @Param('quizId') id: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.quizService.getQuizWithQuestionsForUser(+id, +user.id);
   }
 
   @UseGuards(UserGuard)
   @Post('/submit')
-  submitQuiz(@CurrentUser() user:User,@Body() body:SubmitQuizDto)
-  {
-    return this.quizService.submitQuiz(user.id,body)
+  submitQuiz(@CurrentUser() user: User, @Body() body: SubmitQuizDto) {
+    return this.quizService.submitQuiz(user.id, body);
   }
 }

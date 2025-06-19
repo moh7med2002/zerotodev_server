@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { UserGuard } from 'src/guards/user.guard';
 import { createCommentDto } from './dto/create-comment.dto';
@@ -7,12 +16,13 @@ import { User } from '../user/entities/user.entity';
 import { Serilaize } from 'src/common/interceptors/serialize.interceptor';
 import { UserCommentDto } from './dto/use-comment.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { ActiveUserGuard } from 'src/guards/active.user.guard';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, ActiveUserGuard)
   @Post('create')
   createComment(@Body() body: createCommentDto, @CurrentUser() user: User) {
     return this.commentService.create(body, user.id);
@@ -39,11 +49,11 @@ export class CommentController {
 
   @Get(':itemId')
   getComments(
-  @Param('itemId') itemId: string,
-  @Query('page') page: string = '1',
-  @Query('limit') limit: string = '10',
-  @Query('type') type: 'article' | 'question'
-) {
-  return this.commentService.getCommentsByItemId(+page, +limit, itemId, type);
-}
+    @Param('itemId') itemId: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('type') type: 'article' | 'question',
+  ) {
+    return this.commentService.getCommentsByItemId(+page, +limit, itemId, type);
+  }
 }

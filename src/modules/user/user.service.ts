@@ -214,4 +214,13 @@ export class UserService {
       pointsHistoryCount: user.pointsHistory?.length || 0,
     };
   }
+
+  async chnageUserActiveStatus(userId: number) {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('هذا الحساب غير موجدود');
+    }
+    user.active = !user.active;
+    return user.save();
+  }
 }
