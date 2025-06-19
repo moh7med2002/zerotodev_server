@@ -91,8 +91,9 @@ export class UserController {
   getAll(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '5',
+    @Query('search') search: string = '',
   ) {
-    return this.userService.getAllUsers(+page, +limit);
+    return this.userService.getAllUsers(+page, +limit, search);
   }
 
   @Serilaize(AdminUserProfileDto)
