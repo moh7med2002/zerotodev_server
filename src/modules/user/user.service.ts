@@ -19,6 +19,7 @@ import { Article } from '../article/article.entity';
 import { SocailMedia } from '../social-media/social-media.entity';
 import { Skill } from '../skill/skill.entity';
 import { Question } from '../question/question.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UserService {
@@ -125,11 +126,19 @@ export class UserService {
     return this.userRepo.count();
   }
 
-  async getAllUsers(page: number, limit: number) {
+  async getAllUsers(page: number, limit: number, search: string) {
     const offset = (page - 1) * limit;
+    const whereClause = search
+      ? {
+          name: {
+            [Op.like]: `%${search}%`, // استخدام Op.iLike للبحث غير حساس لحالة الأحرف
+          },
+        }
+      : {};
     const { rows, count } = await this.userRepo.findAndCountAll({
       limit,
       offset,
+      where: whereClause,
       order: [['createdAt', 'DESC']],
       attributes: ['id', 'name', 'email', 'image', 'points', 'createdAt'],
     });
@@ -213,5 +222,14 @@ export class UserService {
       questionsViewed: user.viewedQuestions?.length || 0,
       pointsHistoryCount: user.pointsHistory?.length || 0,
     };
+  }
+
+  async chnageUserActiveStatus(userId: number) {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('هذا الحساب غير موجدود');
+    }
+    user.active = !user.active;
+    return user.save();
   }
 }

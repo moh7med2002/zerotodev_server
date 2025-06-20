@@ -91,8 +91,9 @@ export class UserController {
   getAll(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '5',
+    @Query('search') search: string = '',
   ) {
-    return this.userService.getAllUsers(+page, +limit);
+    return this.userService.getAllUsers(+page, +limit, search);
   }
 
   @Serilaize(AdminUserProfileDto)
@@ -117,5 +118,10 @@ export class UserController {
   @Get('profile/:id')
   getUserPublicProfile(@Param('id') id: string) {
     return this.userService.getUserPublicProfile(+id);
+  }
+
+  @Put('/active/:userId')
+  changeUserActiveStatus(@Param('userId') userId: string) {
+    return this.userService.chnageUserActiveStatus(+userId);
   }
 }

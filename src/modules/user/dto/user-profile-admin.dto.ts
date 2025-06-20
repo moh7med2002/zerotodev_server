@@ -33,6 +33,9 @@ export class AdminUserProfileDto {
   createdAt: Date;
 
   @Expose()
+  active: Boolean;
+
+  @Expose()
   @Type(() => PointsHistoryDto)
   pointsHistory: PointsHistoryDto[];
 
