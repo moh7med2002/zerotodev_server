@@ -57,11 +57,11 @@ export class AdminService {
     const { oldPassword, newPassword } = body;
     const admin = await this.findOne();
     if (!admin) {
-      throw new NotFoundException('admin is not found');
+      throw new NotFoundException('حساب الأدمن غير موجود');
     }
     const isMatch = await comparePassword(oldPassword, admin.password);
     if (!isMatch) {
-      throw new BadRequestException('password is wrong');
+      throw new BadRequestException('كلمة المرور السابقة خاطئة');
     }
     const hashedPassword = await hashPassword(newPassword);
     admin.password = hashedPassword;
@@ -72,11 +72,11 @@ export class AdminService {
   async changeEmail(newEmail: string) {
     const admin = await this.findOne();
     if (!admin) {
-      throw new NotFoundException('admin is not found');
+      throw new NotFoundException('حساب الأدمن غير موجود');
     }
     const adminByEmail = await this.findByEmail(newEmail);
     if (adminByEmail) {
-      throw new BadRequestException('email is in use');
+      throw new BadRequestException('الإيميل مستخدم مسبقا');
     }
     admin.email = newEmail;
     await admin.save();
