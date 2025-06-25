@@ -13,6 +13,7 @@ import { RequestedQuestion } from 'src/modules/rquested_question/requested_quest
 import { Skill } from 'src/modules/skill/skill.entity';
 import { SocailMedia } from 'src/modules/social-media/social-media.entity';
 import { User } from 'src/modules/user/entities/user.entity';
+import { VerifyCode } from 'src/modules/user/entities/UserVerifyCode';
 import { UserPoint } from 'src/modules/user_point/user_point.entity';
 import { UserQuiz } from 'src/modules/user_quiz/user_quiz.entity';
 
@@ -46,8 +47,9 @@ export const databaseProviders = [
         UserQuiz,
         Skill,
         SocailMedia,
+        VerifyCode,
       ]);
-      await sequelize.sync({ alter: false });
+      await sequelize.sync({ alter: true });
       return sequelize;
     },
   },

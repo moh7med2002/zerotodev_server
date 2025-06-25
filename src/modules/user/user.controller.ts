@@ -29,6 +29,11 @@ import { AdminGuard } from 'src/guards/admin.guard';
 import { AdminUserProfileDto } from './dto/user-profile-admin.dto';
 import { TopUserDto } from './dto/top-user.dto';
 import { UserPublicProfileDto } from './dto/user-public-profile.dto';
+import {
+  ResetPasswordDto,
+  UserRequestVerifyCodeDto,
+  UserSendVerifyCodeDto,
+} from './dto/verify-code.dto';
 
 @Controller('user')
 export class UserController {
@@ -50,7 +55,22 @@ export class UserController {
     return this.userService.login(body);
   }
 
-  @UseGuards(UserGuard)
+  @Post('request-code')
+  async requestVerficationCode(@Body() body: UserRequestVerifyCodeDto) {
+    await this.userService.requestCode(body);
+    return { message: 'تم إرسال رمز التحقق بنجاح' };
+  }
+
+  @Put('verify-code')
+  async sendVerficationCode(@Body() body: UserSendVerifyCodeDto) {
+    return this.userService.verifyCodeCheck(body);
+  }
+
+  @Put('reset-password')
+  async resetPassword(@Body() body: ResetPasswordDto) {
+    return this.userService.resetPassword(body);
+  }
+
   @Serilaize(UserDto)
   @Patch('email')
   @UseGuards(UserGuard)
