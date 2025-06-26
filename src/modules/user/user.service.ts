@@ -314,4 +314,14 @@ export class UserService {
     await user.save();
     return await savedCode.destroy();
   }
+
+  async deleteUserAccountByAdmin(userId: number) {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('هذا الحساب غير متوفر');
+    }
+    const imagePath = user.image;
+    await user.destroy();
+    return await removeImage(user.image);
+  }
 }

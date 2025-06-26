@@ -97,7 +97,7 @@ export class ArticleController {
 
   @Serilaize(DetailedArticleDto)
   @UseGuards(OptionalUserGuard)
-  @Get(':id') 
+  @Get(':id')
   getSingleArticle(
     @Param('id') id: string,
     @CurrentUser() user: User | null,

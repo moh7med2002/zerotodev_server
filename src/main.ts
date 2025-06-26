@@ -25,7 +25,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   await app.listen(3270);
 }
 bootstrap();

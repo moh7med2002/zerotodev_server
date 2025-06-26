@@ -49,7 +49,7 @@ export const databaseProviders = [
         SocailMedia,
         VerifyCode,
       ]);
-      await sequelize.sync({ alter: true });
+      await sequelize.sync({ alter: false });
       return sequelize;
     },
   },
