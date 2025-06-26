@@ -17,4 +17,5 @@ export enum repositories {
   user_point_repository = 'user_point_repository',
   skill_repository = 'skill_repository',
   social_media_repository = 'social_media_repository',
+  verify_code_repository = 'verify_code_repository',
 }

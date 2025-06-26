@@ -6,6 +6,7 @@ import {
   AllowNull,
   BelongsToMany,
   HasMany,
+  HasOne,
 } from 'sequelize-typescript';
 import { Article } from 'src/modules/article/article.entity';
 import { ArticleView } from 'src/modules/article_view/article_view.entity';
@@ -17,6 +18,7 @@ import { Skill } from 'src/modules/skill/skill.entity';
 import { SocailMedia } from 'src/modules/social-media/social-media.entity';
 import { UserPoint } from 'src/modules/user_point/user_point.entity';
 import { UserQuiz } from 'src/modules/user_quiz/user_quiz.entity';
+import { VerifyCode } from './UserVerifyCode';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
@@ -74,4 +76,7 @@ export class User extends Model {
 
   @HasMany(() => SocailMedia)
   socialmedias: SocailMedia[];
+
+  @HasOne(() => VerifyCode)
+  verifyCode: VerifyCode;
 }

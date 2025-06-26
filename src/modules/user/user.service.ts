@@ -20,11 +20,21 @@ import { SocailMedia } from '../social-media/social-media.entity';
 import { Skill } from '../skill/skill.entity';
 import { Question } from '../question/question.entity';
 import { Op } from 'sequelize';
+import { VerifyCode } from './entities/UserVerifyCode';
+import {
+  ResetPasswordDto,
+  UserRequestVerifyCodeDto,
+  UserSendVerifyCodeDto,
+} from './dto/verify-code.dto';
+import { generateCode } from 'src/common/utils/generateVerifyCode';
+import { sendEmail } from 'src/common/utils/sendEmail';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject(repositories.user_repository) private userRepo: typeof User,
+    @Inject(repositories.verify_code_repository)
+    private verifuCodeRepo: typeof VerifyCode,
   ) {}
 
   async signUp(body: createUserDto, imageUrl?: string) {
@@ -231,5 +241,77 @@ export class UserService {
     }
     user.active = !user.active;
     return user.save();
+  }
+
+  async requestCode(dto: UserRequestVerifyCodeDto) {
+    const user = await this.userRepo.findOne({ where: { email: dto.email } });
+    if (!user) {
+      throw new NotFoundException('هذا الإيميل غير مستخدم');
+    }
+
+    await this.verifuCodeRepo.destroy({ where: { userId: user.id } });
+
+    const codeStr = generateCode(); // مثل: "834291"
+    const code = await this.verifuCodeRepo.create({
+      userId: user.id,
+      code: codeStr,
+      expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // بعد ساعتين
+    });
+
+    await code.save();
+
+    const emailHtml = `
+    <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right; padding: 20px; background-color: #f8f8fc;">
+      <h2 style="color: #c40044;">رمز التحقق الخاص بك</h2>
+      <p>مرحبًا ${user.name || ''}،</p>
+      <p>لقد طلبت إعادة تعيين كلمة المرور. الرجاء استخدام رمز التحقق التالي:</p>
+      <div style="font-size: 24px; font-weight: bold; color: #1e1e2f; margin: 20px 0;">${codeStr}</div>
+      <p>ينتهي صلاحية هذا الرمز بعد ساعتين.</p>
+      <p style="color: #6c6c80;">إذا لم تطلب هذا الرمز، يمكنك تجاهل هذا البريد.</p>
+    </div>
+  `;
+
+    return await sendEmail({
+      to: user.email,
+      subject: '🔐 رمز التحقق لإعادة تعيين كلمة المرور',
+      html: emailHtml,
+    });
+  }
+
+  async verifyCodeCheck(dto: UserSendVerifyCodeDto) {
+    const user = await this.userRepo.findOne({ where: { email: dto.email } });
+    if (!user) {
+      throw new NotFoundException('هذا الإيميل غير مستخدم');
+    }
+    const savedCode = await this.verifuCodeRepo.findOne({
+      where: {
+        code: dto.code,
+        userId: user.id,
+        expiresAt: {
+          [Op.gt]: new Date(), // شرط أن يكون التاريخ لاحق للوقت الحالي
+        },
+      },
+    });
+    if (!savedCode) {
+      throw new NotFoundException('الرجاء إدخال رمز التحقق الصحيح');
+    }
+    savedCode.isVerify = true;
+    return await savedCode.save();
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.userRepo.findOne({ where: { email: dto.email } });
+    if (!user) {
+      throw new NotFoundException('هذا الإيميل غير مستخدم');
+    }
+    const savedCode = await this.verifuCodeRepo.findOne({
+      where: { userId: user.id, isVerify: true },
+    });
+    if (!savedCode) {
+      throw new NotFoundException('يتعذر إعادة تعيين كلمة المرور');
+    }
+    user.password = await hashPassword(dto.password);
+    await user.save();
+    return await savedCode.destroy();
   }
 }
