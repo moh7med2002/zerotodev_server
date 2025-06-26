@@ -1,5 +1,5 @@
 export enum Points {
-    question=1,
-    article=1,
-    answer=1
+    question=5,
+    article=10,
+    answer=2
 }
