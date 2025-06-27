@@ -59,7 +59,7 @@ export class UserService {
   async login(body: loginUserDto) {
     const userByEmail = await this.findByEmail(body.email);
     if (!userByEmail) {
-      throw new NotFoundException('الايميل غير صحيح');
+      throw new NotFoundException('الإيميل غير مستخدم');
     }
     const isMatch = await comparePassword(body.password, userByEmail.password);
     if (!isMatch) {
@@ -192,7 +192,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('هذا الحساب غير متوفر');
     }
 
     return {
@@ -222,7 +222,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('هذا الحساب غير متوفر');
     }
 
     return {

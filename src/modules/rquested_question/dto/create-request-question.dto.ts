@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength } from "class-validator";
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateRequestQuestionDto {
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(255, { message: 'يجب ألا يزيد السؤال عن 255 حرفًا' })
-    title:string
+  @IsString({ message: 'السؤال يجب أن يكون نصًا' })
+  @IsNotEmpty({ message: 'السؤال مطلوب' })
+  @MaxLength(255, { message: 'يجب ألا يزيد السؤال عن 255 حرفًا' })
+  title: string;
 }

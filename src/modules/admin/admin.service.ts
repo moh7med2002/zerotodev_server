@@ -27,7 +27,7 @@ export class AdminService {
   async signup(email: string, password: string) {
     const existingAdmin = await this.findOne();
     if (existingAdmin) {
-      throw new BadRequestException('An admin already exists in the system');
+      throw new BadRequestException('يوجد حساب أدمن مسجل في النظام');
     }
     const passwordHashed = await hashPassword(password);
     const admin = await this.create(email, passwordHashed);

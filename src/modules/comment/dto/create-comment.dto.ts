@@ -1,16 +1,22 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
-export class createCommentDto{
-    @IsOptional()
-    @IsNumber()
-    questionId:number
+export class createCommentDto {
+  @IsOptional()
+  @IsNumber({}, { message: 'معرّف السؤال يجب أن يكون رقمًا' })
+  questionId: number;
 
-    @IsOptional()
-    @IsNumber()
-    articleId:number
+  @IsOptional()
+  @IsNumber({}, { message: 'معرّف المقال يجب أن يكون رقمًا' })
+  articleId: number;
 
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(255, { message: 'يجب ألا يزيد التعليق عن 255 حرفًا' })
-    comment:string
+  @IsString({ message: 'التعليق يجب أن يكون نصًا' })
+  @IsNotEmpty({ message: 'التعليق مطلوب' })
+  @MaxLength(255, { message: 'يجب ألا يزيد التعليق عن 255 حرفًا' })
+  comment: string;
 }
