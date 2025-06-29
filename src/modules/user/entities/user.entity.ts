@@ -19,6 +19,7 @@ import { SocailMedia } from 'src/modules/social-media/social-media.entity';
 import { UserPoint } from 'src/modules/user_point/user_point.entity';
 import { UserQuiz } from 'src/modules/user_quiz/user_quiz.entity';
 import { VerifyCode } from './UserVerifyCode';
+import { RequestedQuestion } from 'src/modules/rquested_question/requested_question.entity';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
@@ -76,6 +77,9 @@ export class User extends Model {
 
   @HasMany(() => SocailMedia)
   socialmedias: SocailMedia[];
+
+  @HasMany(() => RequestedQuestion)
+  requestedQuestions: RequestedQuestion[];
 
   @HasOne(() => VerifyCode)
   verifyCode: VerifyCode;

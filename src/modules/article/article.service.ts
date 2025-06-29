@@ -105,7 +105,7 @@ export class ArticleService {
     });
 
     if (!article) {
-      throw new NotFoundException('المقالة غير متوفر');
+      throw new NotFoundException('المقالة غير موجودة');
     }
     const result = article.toJSON();
     result.commentCount = article?.get('commentCount');
@@ -127,7 +127,7 @@ export class ArticleService {
     });
 
     if (!article) {
-      throw new NotFoundException('المقالة غير متوفر');
+      throw new NotFoundException('المقالة غير موجودة');
     }
     return article;
   }

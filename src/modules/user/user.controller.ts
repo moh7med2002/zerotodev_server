@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -143,5 +144,10 @@ export class UserController {
   @Put('/active/:userId')
   changeUserActiveStatus(@Param('userId') userId: string) {
     return this.userService.chnageUserActiveStatus(+userId);
+  }
+
+  @Delete('/:userId')
+  deleteUserAccount(@Param('userId') userId: string) {
+    return this.userService.deleteUserAccountByAdmin(+userId);
   }
 }
