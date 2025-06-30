@@ -19,6 +19,7 @@ import { QuizQuestionService } from '../quiz_question/quiz_question.service';
 import { QuizAnswerService } from '../quiz_answer/quiz_answer.service';
 import { CreateQuizWithQuestionsDto } from './dto/create-quiz-questions.dto';
 import { SubmitQuizDto } from './dto/submit-quiz.dot';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class QuizService {
@@ -37,13 +38,23 @@ export class QuizService {
     return quiz;
   }
 
-  async findAll(page: number, limit: number, status: string) {
+  async findAll(page: number, limit: number, status: string, name?: string) {
     const orderBy =
       status === ItemStatus.PUBLISHED ? 'publish_date' : 'updatedAt';
 
     const offset = (page - 1) * limit;
+
+    const whereClause: any = {
+      status,
+    };
+    if (name) {
+      whereClause.title = {
+        [Op.like]: `%${name}%`, // استخدم Op.iLike لو بدك تجاهل حالة الأحرف
+      };
+    }
+
     const { rows, count } = await this.quizRepo.findAndCountAll({
-      where: { status },
+      where: whereClause,
       limit,
       offset,
       order: [[orderBy, 'DESC']],
@@ -183,23 +194,36 @@ export class QuizService {
     return this.quizRepo.count();
   }
 
-  async submitQuiz(userId:number,body:SubmitQuizDto)
-  {
-    const {quizId,answers} = body
-      const quiz = await this.getQuizWithQuestionsForUser(quizId,userId);
-      const totalQuestions = quiz.questions.length;
-    
-      const submittedAnswers = await this.quizAnswerService.getSubmittedAnswers(answers);
-      this.quizAnswerService.validateSubmittedAnswers(submittedAnswers, totalQuestions);
-    
-      const correctCount = this.quizAnswerService.countCorrectAnswers(submittedAnswers);
-      await this.userQuizService.saveUserQuizResult(userId, quizId, correctCount,totalQuestions);
-      await this.userPointService.givePointForQuizSubmission(userId,quizId,correctCount)
-    
-      return {
-        totalQuestions,
-        correctAnswers: correctCount,
-        score: `${correctCount} / ${totalQuestions}`,
-      };
-    }
+  async submitQuiz(userId: number, body: SubmitQuizDto) {
+    const { quizId, answers } = body;
+    const quiz = await this.getQuizWithQuestionsForUser(quizId, userId);
+    const totalQuestions = quiz.questions.length;
+
+    const submittedAnswers =
+      await this.quizAnswerService.getSubmittedAnswers(answers);
+    this.quizAnswerService.validateSubmittedAnswers(
+      submittedAnswers,
+      totalQuestions,
+    );
+
+    const correctCount =
+      this.quizAnswerService.countCorrectAnswers(submittedAnswers);
+    await this.userQuizService.saveUserQuizResult(
+      userId,
+      quizId,
+      correctCount,
+      totalQuestions,
+    );
+    await this.userPointService.givePointForQuizSubmission(
+      userId,
+      quizId,
+      correctCount,
+    );
+
+    return {
+      totalQuestions,
+      correctAnswers: correctCount,
+      score: `${correctCount} / ${totalQuestions}`,
+    };
+  }
 }

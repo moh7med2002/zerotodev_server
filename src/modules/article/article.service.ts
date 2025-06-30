@@ -16,6 +16,7 @@ import { UserPointService } from '../user_point/user_point.service';
 import { removeImage } from 'src/common/utils/removeImage';
 import { UpdateArtcileStatusDto } from './dto/update-article-status.dto';
 import { Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ArticleService {
@@ -39,13 +40,24 @@ export class ArticleService {
     limit: number,
     status: string,
     categoryId?: string,
+    name?: string,
   ) {
     const offset = (page - 1) * limit;
+    const whereClause: any = {
+      status,
+    };
+
+    if (categoryId) {
+      whereClause.categoryId = categoryId;
+    }
+
+    if (name) {
+      whereClause.title = {
+        [Op.like]: `%${name}%`, // استخدم Op.iLike لو بدك تجاهل حالة الأحرف
+      };
+    }
     const { rows, count } = await this.articleRepo.findAndCountAll({
-      where: {
-        ...(categoryId && { categoryId }),
-        status,
-      },
+      where: whereClause,
       include: [
         {
           model: Category,

@@ -42,8 +42,9 @@ export class QuizController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '5',
     @Query('status') status: string = ItemStatus.PUBLISHED,
+    @Query('name') name?: string,
   ) {
-    return this.quizService.findAll(+page, +limit, status);
+    return this.quizService.findAll(+page, +limit, status, name);
   }
 
   @UseGuards(AdminGuard)
