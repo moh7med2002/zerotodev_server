@@ -64,12 +64,14 @@ export class ArticleController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '5',
     @Query('category') categoryId?: string,
+    @Query('name') name?: string,
   ) {
     return this.articleService.getAll(
       +page,
       +limit,
       ItemStatus.PUBLISHED,
       categoryId,
+      name,
     );
   }
 

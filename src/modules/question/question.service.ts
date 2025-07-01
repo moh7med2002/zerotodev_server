@@ -14,6 +14,7 @@ import { UserPointService } from '../user_point/user_point.service';
 import { CurrentUserPayload } from 'src/common/types/current-user.type';
 import { UpdateQuestionStatusDto } from './dto/update-question-status.dto';
 import { Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class QuestionService {
@@ -42,10 +43,18 @@ export class QuestionService {
     return this.questionRepo.findByPk(id);
   }
 
-  async findAll(page: number, limit: number, status: string) {
+  async findAll(page: number, limit: number, status: string, name?: string) {
     const offset = (page - 1) * limit;
+    const whereClause: any = {
+      status,
+    };
+    if (name) {
+      whereClause.title = {
+        [Op.like]: `%${name}%`, // استخدم Op.iLike لو بدك تجاهل حالة الأحرف
+      };
+    }
     const { rows, count } = await this.questionRepo.findAndCountAll({
-      where: { status },
+      where: whereClause,
       limit,
       offset,
       order: [['publish_date', 'DESC']],

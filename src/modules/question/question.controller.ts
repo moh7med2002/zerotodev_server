@@ -48,8 +48,14 @@ export class QuestionController {
   getAllQuestions(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '5',
+    @Query('name') name?: string,
   ) {
-    return this.questionService.findAll(+page, +limit, ItemStatus.PUBLISHED);
+    return this.questionService.findAll(
+      +page,
+      +limit,
+      ItemStatus.PUBLISHED,
+      name,
+    );
   }
 
   @UseGuards(AdminGuard)
